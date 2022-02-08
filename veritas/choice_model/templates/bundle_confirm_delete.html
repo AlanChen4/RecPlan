@@ -1,0 +1,14 @@
+{% extends 'main.html' %}
+{% block content%}
+
+<div class="container pt-5 w-75 my-auto">
+    <a href="{% url 'bundles' %}">Go back</a>
+    <form method="POST">
+        {% csrf_token %}
+        <p class="py-4 m-auto text-center">Are you sure you want to delete this account?</p>
+        <div class="d-flex justify-content-center">
+            <input class="btn btn-outline-danger" type="submit" value="Delete"/>
+        </div>
+    </form>
+</div>
+{% endblock content%}
