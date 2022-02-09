@@ -6,6 +6,7 @@
 <form method="post">
     {% csrf_token %}
     {{form|crispy}}
+    <input name="next" type="hidden" value="{% url 'bundles' %}">
     <input class="btn btn-outline-success" type="submit" name="login">
 </form>
 
