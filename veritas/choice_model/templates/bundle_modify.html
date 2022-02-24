@@ -1,0 +1,57 @@
+{% extends 'main.html' %}
+{% block content%}
+{% load leaflet_tags %}
+
+<div class="row pt-5">
+    <a href="{% url 'bundles' %}">Go back</a>
+    <h1 class="py-2">Modify <strong>{{ bundle.nickname }}</strong></h1>
+    <div class="row">
+        <div class="col md-6">
+            <form method="GET" action="{% url 'bundle-update' bundle.bundle_id %}">
+                <div class="form-check py-2">
+                    <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if modified %} checked {% endif %}>
+                    <label class="form-check-label" for="modified-only">
+                        Only Show Modified Sites
+                    </label>  
+                    <input class="btn btn-primary" type="submit" value="Filter">
+                </div>
+            </form>
+        </div>
+        <div class="col md-6">
+            <button class="btn btn-outline-success">Add New Site</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6" style="overflow: scroll; height: 75vh;">
+            <table class="table">
+                <thead class="bg-dark text-white">
+                    <tr>
+                        <th>Site Name</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for site in sites %}
+                    <tr class="clickable-row">
+                        <td>{{site.name}}</td>
+                        <td>
+                            <a href="{% url 'modified-site-create' bundle.bundle_id site.name %}">Modify</a>
+                        </td>
+                    </tr>
+                </tbody>
+                {% empty %}
+                <h3>None</h3>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                {% leaflet_map "site_map" %}
+            </div>
+            <div class="row">
+                site characteristics
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content%}
