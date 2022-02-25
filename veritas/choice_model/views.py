@@ -1,13 +1,11 @@
-from ast import Mod
-from tkinter import W
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
-from itertools import chain
 
 from .models import ModifiedSitesBundle, Site, ModifiedSite
+from .utils import get_site_choice_prob
 
 
 class BundleList(LoginRequiredMixin, ListView):
@@ -23,6 +21,22 @@ class BundleDetail(LoginRequiredMixin, DetailView):
     model = ModifiedSitesBundle
     context_object_name = 'bundle'
     template_name = 'bundle.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # get list of modified sites from bundle_id
+        bundle_id = context['bundle'].bundle_id
+        modified_sites = list(ModifiedSite.objects.all().filter(bundle_id=bundle_id))
+
+        # calcualte site choice probabiliteis and the equity evaluation
+        site_choice_probs, equity_evaluation = get_site_choice_prob(modified_sites)
+
+        context['site_choice_probs_labels'] = [site[0] for site in site_choice_probs]
+        context['site_choice_probs_values'] = [site[1] for site in site_choice_probs]
+        context['equity_evaluation'] = equity_evaluation
+
+        return context
 
     def get_queryset(self):
         return super().get_queryset().filter(history_id=self.request.user)
