@@ -5,7 +5,13 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 
 from .models import ModifiedSitesBundle, Site, ModifiedSite
-from .utils import get_site_choice_prob
+from .utils import ChoiceModel
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
+from .dashapps import site_choice_prob
 
 
 class BundleList(LoginRequiredMixin, ListView):
@@ -29,12 +35,53 @@ class BundleDetail(LoginRequiredMixin, DetailView):
         bundle_id = context['bundle'].bundle_id
         modified_sites = list(ModifiedSite.objects.all().filter(bundle_id=bundle_id))
 
-        # calcualte site choice probabiliteis and the equity evaluation
-        site_choice_probs, equity_evaluation = get_site_choice_prob(modified_sites)
+        choice_model = ChoiceModel()
+        site_choice_probs = choice_model.get_site_choice_visit_prob(modified_sites)
+        visitation_probability = choice_model.get_visitation_probability(modified_sites)
 
-        context['site_choice_probs_labels'] = [site[0] for site in site_choice_probs]
-        context['site_choice_probs_values'] = [site[1] for site in site_choice_probs]
-        context['equity_evaluation'] = equity_evaluation
+        baseline_equity_evaluation  = choice_model.get_equity_evaluation([])
+        equity_evaluation = choice_model.get_equity_evaluation(modified_sites)
+
+        # for bubble plot
+        site_choice_prob_labels = list(site_choice_probs.keys())
+        site_choice_prob_values = list(site_choice_probs.values())
+        site_choice_prob_sizes = [min(site * 1000, 500) for site in site_choice_prob_values]
+        bubble_fig = go.Figure(data=[go.Scatter(
+            x=site_choice_prob_labels,
+            y=site_choice_prob_values,
+            marker_size=site_choice_prob_sizes,
+            mode='markers',
+        )])
+        bubble_fig.update_layout(
+            margin=dict(l=20, r=20, b=5, t=5),
+        )
+
+        # for scatter map
+        site_location_and_prob = pd.merge(
+            visitation_probability.mean(axis=1).to_frame(),
+            choice_model.site_and_location,
+            left_index=True, right_index=True
+        )
+        site_location_and_prob = site_location_and_prob.rename(columns={0: 'Visitation Probability'})
+        site_location_and_prob = site_location_and_prob.reset_index()
+        map_scatter_fig = px.scatter_mapbox(
+            site_location_and_prob,
+            lat='latitude', 
+            lon='longitude', 
+            color='Visitation Probability', 
+            size='Visitation Probability', 
+            hover_name='name')
+        map_scatter_fig.update_layout(mapbox_style='open-street-map')
+
+        context['dash_context'] = {
+            'bubble-plot': {'figure': bubble_fig},
+            'map-scatter-plot': {'figure': map_scatter_fig}
+        }
+
+        context['baseline_equity_black'] = round(baseline_equity_evaluation['average_utility_black'], 3)
+        context['baseline_equity_other'] = round(baseline_equity_evaluation['average_utility_other'], 3)
+        context['counterfactual_equity_black'] = round(equity_evaluation['average_utility_black'], 3)
+        context['counterfactual_equity_other'] = round(equity_evaluation['average_utility_other'], 3)
 
         return context
 

@@ -1,5 +1,33 @@
 {% extends 'main.html' %}
+{% load plotly_dash %}
 {% block content %}
-<a href="{% url 'bundles' %}">Go back</a>
-<h1>{{bundle.nickname}}</h1>
+<div class="p-4">
+    <a href="{% url 'bundles' %}">Go back</a>
+    <h1 class="py-2">Viewing <strong>{{bundle.nickname}}</strong></h1>
+    <div class="my-1">
+        <h4>Equity Evaluation (Average Utility)</h4>
+        <table class="table">
+            <thead class="bg-dark text-white">
+                <tr>
+                    <th>Baseline Black</th>
+                    <th>Baseline Other</th>
+                    <th>Counterfactual Black</th>
+                    <th>Counterfactual Other</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{baseline_equity_black}}</td>
+                    <td>{{baseline_equity_other}}</td>
+                    <td>{{counterfactual_equity_black}}</td>
+                    <td>{{counterfactual_equity_other}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="my-2">
+        <h4>Site Choice Probabilities</h4>
+        {% plotly_app name="SiteChoiceProb" ratio=0.5 initial_arguments=dash_context %}
+    </div>
+</div>
 {% endblock content %}

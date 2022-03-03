@@ -1,6 +1,5 @@
 {% extends 'main.html' %}
 {% block content%}
-{% load leaflet_tags %}
 
 <div class="row pt-5">
     <a href="{% url 'bundles' %}">Go back</a>
@@ -45,9 +44,6 @@
             </table>
         </div>
         <div class="col-md-6">
-            <div class="row">
-                {% leaflet_map "site_map" %}
-            </div>
             <div class="row">
                 site characteristics
             </div>
