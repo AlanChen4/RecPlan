@@ -109,7 +109,8 @@ class BundleUpdate(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        bundle_id = self.request.path.split('/')[-2]
+        bundle_id = context['bundle'].bundle_id
+        context['bundle_id'] = bundle_id
         if self.request.GET.get('modified-only') == 'on':
             context['modified'] = True
             context['sites'] = ModifiedSite.objects.all().filter(bundle_id=bundle_id).order_by('name')
@@ -136,7 +137,6 @@ class ModifiedSiteCreate(LoginRequiredMixin, CreateView):
     model = ModifiedSite
     fields = ['name', 'acres', 'trails', 'trail_miles', 'picnic_area', 'sports_facilities', 
               'swimming_facilities', 'boat_launch', 'waterbody', 'bathrooms', 'playgrounds']
-    success_url = reverse_lazy('bundles')
     template_name = 'modified_site_create.html'
 
     def get_context_data(self, **kwargs):
@@ -176,10 +176,17 @@ class ModifiedSiteCreate(LoginRequiredMixin, CreateView):
 
         return initial
 
+    def get_success_url(self):
+        bundle_id = self.request.path.split('/')[2]
+        return reverse_lazy('bundle-update', kwargs={'pk': bundle_id})
+
     def form_valid(self, form):
         bundle_id = self.request.path.split('/')[2]
 
         form.instance.history_id = self.request.user
         form.instance.bundle_id = ModifiedSitesBundle.objects.get(bundle_id=bundle_id)
+
+        if ModifiedSite.objects.filter(bundle_id=bundle_id).filter(name=form.instance.name).exists():
+            ModifiedSite.objects.filter(bundle_id=bundle_id).filter(name=form.instance.name).delete()
 
         return super().form_valid(form)
