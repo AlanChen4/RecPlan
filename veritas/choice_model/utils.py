@@ -4,131 +4,164 @@ import pandas as pd
 from pathlib import Path
 
 
-def get_site_choice_prob(sites, underserved_evaluation=True):
-    """
-    Calculates the average site choice probability based on exponential total utility
-    :param sites: list of modified sites
-    :param underserved_evaluation: if True, returns the evaluation of equity groups as well
-    :return: 2D array representing site choice probabilities
-    """
-    site_data = pd.read_parquet(Path().resolve() / 'choice_model/data/site_data.parquet')
-    site_coefficients = pd.read_parquet(Path().resolve() / 'choice_model/data/site_coefficients.parquet')
-    distances = pd.read_parquet(Path().resolve() / 'choice_model/data/distances.parquet')
-    calibration = pd.read_parquet(Path().resolve() / 'choice_model/data/calibration.parquet')
-    population = pd.read_parquet(Path().resolve() / 'choice_model/data/model_population.parquet')
+class ChoiceModel():
 
-    # replace old site_data with modified sites
-    for site in sites:
-        site_data = site_data.drop(index=site.name)
-        modified_site = pd.DataFrame({
-            'name': [site.name],
-            'acres': [site.acres],
-            'trails': [site.trails], 'trail_miles': [site.trail_miles],
-            'picnic_area': [site.picnic_area],
-            'sports_facilities': [site.sports_facilities],
-            'swimming_facilities': [site.swimming_facilities],
-            'boat_launch': [site.boat_launch], 'waterbody': [site.waterbody],
-            'bathrooms': [site.bathrooms], 'playgrounds': [site.playgrounds]
-        })
-        modified_site = modified_site.set_index('name')
-        site_data = site_data.append(modified_site)
-    site_data = site_data.astype(float)
+    def __init__(self):
+        self.site_and_location = pd.read_parquet(Path().resolve() / 'choice_model/data/site_and_location.parquet')
+        self.site_data = pd.read_parquet(Path().resolve() / 'choice_model/data/site_data.parquet')
+        self.site_coefficients = pd.read_parquet(Path().resolve() / 'choice_model/data/site_coefficients.parquet')
+        self.distances = pd.read_parquet(Path().resolve() / 'choice_model/data/distances.parquet')
+        self.calibration = pd.read_parquet(Path().resolve() / 'choice_model/data/calibration.parquet')
+        self.population = pd.read_parquet(Path().resolve() / 'choice_model/data/model_population.parquet')
 
-    # add acreage_scalar
-    site_data['acreage_scalar'] = site_data['acres']
-    site_data['acres'] = site_data['acres']
-    site_data['acreage_scalar'].where(site_data['acreage_scalar'] > 3000,
-                                      1, inplace=True)
-    site_data['acreage_scalar'].where(site_data['acreage_scalar'] < 3000,
-                                      0.2, inplace=True)
+    def _get_updated_site_df(self, modified_sites):
+        """
+        Return site data DataFrame except sites are replaced if modified versions of them exist
+        :param modified_sites: list of modified site objects
+        :return: DataFrame of site data with existing modified sites replaced
+        """
+        updated_site_data = self.site_data
+        for modified_site in modified_sites:
+            updated_site_data = updated_site_data.drop(index=modified_site.name)
+            modified_site_df = pd.DataFrame({
+                'name': [modified_site.name],
+                'acres': [modified_site.acres],
+                'trails': [modified_site.trails], 'trail_miles': [modified_site.trail_miles],
+                'picnic_area': [modified_site.picnic_area],
+                'sports_facilities': [modified_site.sports_facilities],
+                'swimming_facilities': [modified_site.swimming_facilities],
+                'boat_launch': [modified_site.boat_launch], 'waterbody': [modified_site.waterbody],
+                'bathrooms': [modified_site.bathrooms], 'playgrounds': [modified_site.playgrounds]
+            })
+            modified_site_df = modified_site_df.set_index('name')
+            updated_site_data = pd.concat([updated_site_data, modified_site_df])
+        updated_site_data = updated_site_data.astype(float)
+        return updated_site_data
 
-    # update acres by multiplying old acres with either the 0.2 or 1
-    site_data['acres'] = site_data['acres'].multiply(site_data['acreage_scalar'])
-    site_data = site_data.fillna(0)
+    def _update_model_values(self, updated_site_data):
+        """
+        Update the model variables based on updated sites
+        """
+        # add acreage_scalar
+        updated_site_data['acreage_scalar'] = updated_site_data['acres']
+        updated_site_data['acres'] = updated_site_data['acres']
+        updated_site_data['acreage_scalar'].where(updated_site_data['acreage_scalar'] > 3000, 1, inplace=True)
+        updated_site_data['acreage_scalar'].where(updated_site_data['acreage_scalar'] < 3000, 0.2, inplace=True)
 
-    # calculate site_product from site_data and site_coefficients
-    site_product = site_data.iloc[:, :-1].mul(site_coefficients.values,
-                                              axis=1).sum(axis=1)
-    site_product = site_product.to_frame().rename(columns={0: "Product"})
+        # update acres by multiplying old acres with either the 0.2 or 1
+        updated_site_data['acres'] = updated_site_data['acres'].multiply(updated_site_data['acreage_scalar'])
+        updated_site_data = updated_site_data.fillna(0)
 
-    # calculate distance_product from distance_coefficient and distances data
-    distance_coefficient = np.repeat(-0.011, distances.shape[1])
-    distance_product = distances.mul(distance_coefficient, axis=1)
+        # calculate site_product from site_data and site_coefficients
+        site_product = updated_site_data.iloc[:, :-1].mul(self.site_coefficients.values, axis=1).sum(axis=1)
+        site_product = site_product.to_frame().rename(columns={0: "Product"})
 
-    # in both distance product and site product, used to add together
-    ds_in_both = distance_product.index.intersection(site_product.index)
+        # calculate distance_product from distance_coefficient and distances data
+        distance_coefficient = np.repeat(-0.011, self.distances.shape[1])
+        distance_product = self.distances.mul(distance_coefficient, axis=1)
 
-    # sort each so that they have matching index order
-    site_product = site_product.sort_index()
-    distance_product = distance_product.loc[ds_in_both].sort_index()
+        # in both distance product and site product, used to add together
+        ds_in_both = distance_product.index.intersection(site_product.index)
 
-    site_attractiveness = distance_product.add(site_product.values,
-                                               axis=1)
+        # sort each so that they have matching index order
+        site_product = site_product.sort_index()
+        distance_product = distance_product.loc[ds_in_both].sort_index()
 
-    exp_site_attractiveness = np.exp(site_attractiveness)
+        self.site_attractiveness = distance_product.add(site_product.values, axis=1)
 
-    ec_in_both = exp_site_attractiveness.index.intersection(calibration.index)
-    calibration = calibration.loc[ec_in_both]
+        self.exp_site_attractiveness = np.exp(self.site_attractiveness)
 
-    calibrated_attractiveness = exp_site_attractiveness.add(calibration.values, axis=1)
+        ec_in_both = self.exp_site_attractiveness.index.intersection(self.calibration.index)
+        new_calibration = self.calibration.loc[ec_in_both]
 
-    visitation_probability = calibrated_attractiveness.div(calibrated_attractiveness.sum(axis=0), axis=1)
-    visitation_probability[visitation_probability < 0] = 0
+        calibrated_attractiveness = self.exp_site_attractiveness.add(new_calibration.values, axis=1)
 
-    average_visitation_probability = visitation_probability.mean(axis=1)
+        self.visitation_probability = calibrated_attractiveness.div(calibrated_attractiveness.sum(axis=0), axis=1)
+        self.visitation_probability[self.visitation_probability < 0] = 0
 
-    output = [[i, s] for i, s in zip(average_visitation_probability.index.to_list(),
-                                     average_visitation_probability.values.tolist())]
 
-    # equity_evaluation not needed
-    if not underserved_evaluation:
-        return output
+    def get_site_choice_visit_prob(self, modified_sites):
+        """
+        Returns dictionary with sites and their respective visit probability
+        """
+        # replace old site_data with modified sites
+        modified_site_data = self._get_updated_site_df(modified_sites)
 
-    site_attractiveness[site_attractiveness == 0] = -1000
-    utility_index = np.log(exp_site_attractiveness)
-    
-    # Underserved Evaluation
-    percent_black = population['Black'] / (population['Black'] + population['Other'])
-    percent_other = population['Other'] / (population['Black'] + population['Other'])
+        # update model values
+        self._update_model_values(modified_site_data)
 
-    underserved_evaluation_black = percent_black / (visitation_probability * utility_index).sum(axis=0)
-    underserved_evaluation_other = percent_other / (visitation_probability * utility_index).sum(axis=0)
+        # convert the average visitation probabilites into dictionary
+        average_visitation_prob = self.visitation_probability.mean(axis=1)
+        site_choice_probs = {}
+        for name, prob in zip(average_visitation_prob.index.to_list(), average_visitation_prob.values.tolist()):
+            site_choice_probs[name] = prob
 
-    # Population Trips
-    trips_per_person = 10 * 15.79 / 11.29
-    population_trips = population * trips_per_person
+        return site_choice_probs
 
-    # Total Trips by Equity Group
-    total_trips_by_equity_group = population_trips.sum()
+    def get_equity_evaluation(self, modified_sites):
+        """
+        Returns dictionary the equity evaluations
+        """
+        # replace old site_data with modified sites
+        modified_site_data = self._get_updated_site_df(modified_sites)
 
-    # All Trips
-    all_trips_black = population_trips['Black'] * visitation_probability
-    all_trips_other = population_trips['Other'] * visitation_probability
-    all_trips_total = all_trips_black + all_trips_other
+        # update model values
+        self._update_model_values(modified_site_data)
 
-    # Utility Weighted Trips
-    utility_weighted_trips_black = all_trips_black * utility_index
-    utility_weighted_trips_other = all_trips_other * utility_index
-    utility_weighted_trips_total = all_trips_total * utility_index
+        site_attractiveness = self.site_attractiveness
+        site_attractiveness[site_attractiveness == 0] = -1000
+        utility_index = np.log(self.exp_site_attractiveness)
+        
+        # Underserved Evaluation
+        percent_black = self.population['Black'] / (self.population['Black'] + self.population['Other'])
+        percent_other = self.population['Other'] / (self.population['Black'] + self.population['Other'])
 
-    # Total Utility by Equity Group
-    total_utility_black = utility_weighted_trips_black.sum().sum()
-    total_utility_other = utility_weighted_trips_other.sum().sum()
+        underserved_evaluation_black = percent_black / (self.visitation_probability * utility_index).sum(axis=0)
+        underserved_evaluation_other = percent_other / (self.visitation_probability * utility_index).sum(axis=0)
 
-    # Average Utility by Equity Group
-    average_utility_black = total_utility_black / total_trips_by_equity_group['Black']
-    average_utility_other = total_utility_other / total_trips_by_equity_group['Other']
+        # Population Trips
+        trips_per_person = 10 * 15.79 / 11.29
+        population_trips = self.population * trips_per_person
 
-    # Exponentiate and find ratio
-    exp_average_utility_black = np.exp(average_utility_black)
-    exp_average_utility_other = np.exp(average_utility_other)
+        # Total Trips by Equity Group
+        total_trips_by_equity_group = population_trips.sum()
 
-    exp_ratio_black = exp_average_utility_black / (exp_average_utility_black + exp_average_utility_other)
-    exp_ratio_other = exp_average_utility_other / (exp_average_utility_black + exp_average_utility_other)
+        # All Trips
+        all_trips_black = population_trips['Black'] * self.visitation_probability
+        all_trips_other = population_trips['Other'] * self.visitation_probability
+        all_trips_total = all_trips_black + all_trips_other
 
-    equity_evaluation = {
-        'average_utility_black': exp_ratio_black, 
-        'average_utility_other': exp_ratio_other
-    }
+        # Utility Weighted Trips
+        utility_weighted_trips_black = all_trips_black * utility_index
+        utility_weighted_trips_other = all_trips_other * utility_index
+        utility_weighted_trips_total = all_trips_total * utility_index
 
-    return output, equity_evaluation
+        # Total Utility by Equity Group
+        total_utility_black = utility_weighted_trips_black.sum().sum()
+        total_utility_other = utility_weighted_trips_other.sum().sum()
+
+        # Average Utility by Equity Group
+        average_utility_black = total_utility_black / total_trips_by_equity_group['Black']
+        average_utility_other = total_utility_other / total_trips_by_equity_group['Other']
+
+        # Exponentiate and find ratio
+        exp_average_utility_black = np.exp(average_utility_black)
+        exp_average_utility_other = np.exp(average_utility_other)
+
+        exp_ratio_black = exp_average_utility_black / (exp_average_utility_black + exp_average_utility_other)
+        exp_ratio_other = exp_average_utility_other / (exp_average_utility_black + exp_average_utility_other)
+
+        equity_evaluation = {
+            'average_utility_black': exp_ratio_black, 
+            'average_utility_other': exp_ratio_other
+        }
+        return equity_evaluation
+
+    def get_visitation_probability(self, modified_sites):
+        # replace old site_data with modified sites
+        modified_site_data = self._get_updated_site_df(modified_sites)
+
+        # update model values
+        self._update_model_values(modified_site_data)
+
+        return self.visitation_probability
