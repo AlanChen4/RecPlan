@@ -41,13 +41,13 @@
             <tr>
                 <td>{{bundle.nickname}}</td>
                 <td>
-                    <a href="{% url 'bundle' bundle.bundle_id %}">Calculate</a>
+                    <a class="btn btn-outline-success py-0" href="{% url 'bundle' bundle.bundle_id %}">Calculate</a>
                 </td>
                 <td>
-                    <a href="{% url 'bundle-update' bundle.bundle_id %}">Modify</a>
+                    <a class="btn btn-outline-primary py-0" href="{% url 'bundle-update' bundle.bundle_id %}">Modify</a>
                 </td>
                 <td>
-                    <a href="{% url 'bundle-delete' bundle.bundle_id %}">Delete</a>
+                    <a class="btn btn-outline-danger py-0" href="{% url 'bundle-delete' bundle.bundle_id %}">Delete</a>
                 </td>
             </tr>
         </tbody>
