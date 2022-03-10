@@ -1,3 +1,4 @@
+import h3
 import numpy as np
 import pandas as pd
 
@@ -14,8 +15,21 @@ class ChoiceModel():
         self.calibration = pd.read_parquet(Path().resolve() / 'choice_model/data/calibration.parquet')
         self.population = pd.read_parquet(Path().resolve() / 'choice_model/data/model_population.parquet')
 
-    def _add_to_distances(self, site_name):
-        self.distances.loc[site_name] = 0
+    def _add_to_distances(self, site):
+        new_distance_values = []
+        for coordinates in self.distances.columns:
+            latitude, longitude = coordinates.split(', ')[-2], coordinates.split(', ')[-1]
+
+            coords_1 = (float(latitude), float(longitude))
+            coords_2 = (site.latitude, site.longitude)
+
+            # convert meters to miles
+            distance = h3.point_dist(coords_1, coords_2, unit='m')
+            distance *= 0.000621371
+
+            new_distance_values.append(distance)
+        self.distances.loc[site.name] = new_distance_values
+        print(self.distances.tail())
 
     def _add_to_calibration(self, site_name):
         self.calibration.loc[site_name] = 0
@@ -31,7 +45,7 @@ class ChoiceModel():
             # dealing with a custom added site by user
             if modified_site.name not in updated_site_data.index:
                 # add the new site to the data files (currently setting the values equal to 0)
-                self._add_to_distances(modified_site.name)
+                self._add_to_distances(modified_site)
                 self._add_to_calibration(modified_site.name)
             else:
                 updated_site_data = updated_site_data.drop(index=modified_site.name)

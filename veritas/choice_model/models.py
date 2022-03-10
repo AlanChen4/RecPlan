@@ -31,6 +31,8 @@ class ModifiedSitesBundle(models.Model):
 class ModifiedSite(models.Model):
     _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     bundle_id = models.ForeignKey('ModifiedSitesBundle', on_delete=models.CASCADE)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     name = models.CharField(max_length=100)
     acres = models.FloatField()
     trails = models.IntegerField()

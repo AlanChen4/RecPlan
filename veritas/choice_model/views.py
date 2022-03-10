@@ -135,8 +135,7 @@ class BundleDelete(LoginRequiredMixin, DeleteView):
 
 class ModifiedSiteCreate(LoginRequiredMixin, CreateView):
     model = ModifiedSite
-    fields = ['name', 'acres', 'trails', 'trail_miles', 'picnic_area', 'sports_facilities', 
-              'swimming_facilities', 'boat_launch', 'waterbody', 'bathrooms', 'playgrounds']
+    fields = ['name', 'latitude', 'longitude', 'acres', 'trails', 'trail_miles', 'picnic_area', 'sports_facilities', 'swimming_facilities', 'boat_launch', 'waterbody', 'bathrooms', 'playgrounds']
     template_name = 'modified_site_create.html'
 
     def get_context_data(self, **kwargs):
@@ -156,12 +155,16 @@ class ModifiedSiteCreate(LoginRequiredMixin, CreateView):
         site_name = self.request.path.split('/')[3]
         if ModifiedSite.objects.all().filter(bundle_id=bundle_id).filter(name=site_name).exists():
             site = ModifiedSite.objects.all().filter(bundle_id=bundle_id).get(name=site_name)
+        elif site_name == 'new-site':
+            return initial
         else:
             # get original data belonging to site
             site = Site.objects.get(name=site_name)
 
         initial = {
             'name': site.name,
+            'latitude': site.latitude,
+            'longitude': site.longitude,
             'acres': site.acres,
             'trails': site.trails,
             'trail_miles': site.trail_miles,
