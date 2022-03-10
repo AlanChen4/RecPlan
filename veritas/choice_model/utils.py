@@ -14,6 +14,12 @@ class ChoiceModel():
         self.calibration = pd.read_parquet(Path().resolve() / 'choice_model/data/calibration.parquet')
         self.population = pd.read_parquet(Path().resolve() / 'choice_model/data/model_population.parquet')
 
+    def _add_to_distances(self, site_name):
+        self.distances.loc[site_name] = 0
+
+    def _add_to_calibration(self, site_name):
+        self.calibration.loc[site_name] = 0
+
     def _get_updated_site_df(self, modified_sites):
         """
         Return site data DataFrame except sites are replaced if modified versions of them exist
@@ -22,7 +28,13 @@ class ChoiceModel():
         """
         updated_site_data = self.site_data
         for modified_site in modified_sites:
-            updated_site_data = updated_site_data.drop(index=modified_site.name)
+            # dealing with a custom added site by user
+            if modified_site.name not in updated_site_data.index:
+                # add the new site to the data files (currently setting the values equal to 0)
+                self._add_to_distances(modified_site.name)
+                self._add_to_calibration(modified_site.name)
+            else:
+                updated_site_data = updated_site_data.drop(index=modified_site.name)
             modified_site_df = pd.DataFrame({
                 'name': [modified_site.name],
                 'acres': [modified_site.acres],
