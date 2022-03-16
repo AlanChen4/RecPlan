@@ -1,17 +1,18 @@
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from itertools import chain
 
+from .dashapps import site_choice_prob
 from .models import ModifiedSitesBundle, Site, ModifiedSite
 from .utils import ChoiceModel
 
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-
-from .dashapps import site_choice_prob
 
 
 class BundleList(LoginRequiredMixin, ListView):
@@ -36,7 +37,7 @@ class BundleDetail(LoginRequiredMixin, DetailView):
         modified_sites = list(ModifiedSite.objects.all().filter(bundle_id=bundle_id))
 
         choice_model = ChoiceModel()
-        site_choice_probs = choice_model.get_site_choice_visit_prob(modified_sites)
+        site_choice_probs = choice_model.get_site_visits(modified_sites)
         visitation_probability = choice_model.get_visitation_probability(modified_sites)
 
         baseline_equity_evaluation  = choice_model.get_equity_evaluation([])
@@ -45,7 +46,7 @@ class BundleDetail(LoginRequiredMixin, DetailView):
         # for bubble plot
         site_choice_prob_labels = list(site_choice_probs.keys())
         site_choice_prob_values = list(site_choice_probs.values())
-        site_choice_prob_sizes = [min(site * 1000, 500) for site in site_choice_prob_values]
+        site_choice_prob_sizes = [site/1000 for site in site_choice_prob_values]
         bubble_fig = go.Figure(data=[go.Scatter(
             x=site_choice_prob_labels,
             y=site_choice_prob_values,
@@ -116,7 +117,12 @@ class BundleUpdate(LoginRequiredMixin, UpdateView):
             context['sites'] = ModifiedSite.objects.all().filter(bundle_id=bundle_id).order_by('name')
         else:
             context['modified'] = False
-            context['sites'] = Site.objects.all().order_by('name')
+
+            # prevent original site from showing up if already in modified sites
+            modified_sites = ModifiedSite.objects.all().filter(bundle_id=bundle_id)
+            modified_sites_names = [site.name for site in modified_sites]
+            original_sites = Site.objects.all().exclude(name__in=modified_sites_names)
+            context['sites'] = sorted(list(chain(original_sites, modified_sites)), key=lambda site: site.name)
         return context
 
     def get_queryset(self):
