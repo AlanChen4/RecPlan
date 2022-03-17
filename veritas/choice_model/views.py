@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from itertools import chain
 
-from .dashapps import site_choice_prob
+from .dashapps import site_choice_prob, site_selection
 from .models import ModifiedSitesBundle, Site, ModifiedSite
 from .utils import ChoiceModel
 
@@ -70,9 +70,13 @@ class BundleDetail(LoginRequiredMixin, DetailView):
             lat='latitude', 
             lon='longitude', 
             color='Visitation Probability', 
+            mapbox_style='open-street-map',
             size='Visitation Probability', 
-            hover_name='name')
-        map_scatter_fig.update_layout(mapbox_style='open-street-map')
+            hover_name='name'
+        )
+        map_scatter_fig.update_layout(
+            margin={'l':0, 'r': 0, 't':0, 'b':0}
+        )
 
         context['dash_context'] = {
             'bubble-plot': {'figure': bubble_fig},
@@ -109,9 +113,12 @@ class BundleUpdate(LoginRequiredMixin, UpdateView):
     template_name = 'bundle_modify.html'
 
     def get_context_data(self, **kwargs):
+        # collect context data
         context = super().get_context_data(**kwargs)
         bundle_id = context['bundle'].bundle_id
         context['bundle_id'] = bundle_id
+
+        # check filter for modified-only
         if self.request.GET.get('modified-only') == 'on':
             context['modified'] = True
             context['sites'] = ModifiedSite.objects.all().filter(bundle_id=bundle_id).order_by('name')
@@ -123,6 +130,40 @@ class BundleUpdate(LoginRequiredMixin, UpdateView):
             modified_sites_names = [site.name for site in modified_sites]
             original_sites = Site.objects.all().exclude(name__in=modified_sites_names)
             context['sites'] = sorted(list(chain(original_sites, modified_sites)), key=lambda site: site.name)
+
+        # check if site is being selected to show on map/characteristics
+        if self.request.GET.get('show-site') is not None:
+            # get site characteristics based on name
+            selected_site_name = self.request.GET.get('show-site')
+            
+            if ModifiedSite.objects.all().filter(name=selected_site_name).exists():
+                selected_site = ModifiedSite.objects.all().get(name=selected_site_name)
+            else:
+                selected_site = Site.objects.all().get(name=selected_site_name)
+
+            # pass selected site into context
+            context['selected_site'] = selected_site
+            map_scatter_fig = px.scatter_mapbox(
+                {'name': {0: selected_site.name}, 'latitude': {0: selected_site.latitude}, 'longitude': {0: selected_site.longitude}, 'empty': {0: 0}},
+                lat='latitude', 
+                lon='longitude', 
+                zoom=14,
+                hover_name='name',
+                mapbox_style='open-street-map'
+            )
+            map_scatter_fig.update_layout(
+                margin={'l':0, 'r': 0, 't':0, 'b':0}
+            )
+            context['dash_context'] = {
+                'map-plot': {'figure': map_scatter_fig}
+            }
+        else:
+            map_scatter_fig = px.scatter_mapbox(center={'lat': 100, 'lon': 100})
+            context['selected_site'] = None
+            context['dash_context'] = {
+                'map-plot': {'figure': map_scatter_fig}
+            }
+
         return context
 
     def get_queryset(self):

@@ -1,4 +1,5 @@
 {% extends 'main.html' %}
+{% load plotly_dash %}
 {% block content%}
 
 <div class="row pt-5">
@@ -38,7 +39,7 @@
                             <a href="{% url 'modified-site-create' bundle_id site.name %}">Modify</a>
                         </td>
                         <td>
-                            <a href="">Show</a>
+                            <a href="{% url 'bundle-update' bundle_id  %}?show-site={{site.name}}">Show</a>
                         </td>
                     </tr>
                 </tbody>
@@ -49,8 +50,51 @@
         </div>
         <div class="col-md-6">
             <div class="row">
-                site characteristics
+                {% if selected_site is not None %}
+                    <h2>{{selected_site.name}}</h2>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Acres: <strong>{{selected_site.acres}}</strong></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Waterbody: <strong>{% if selected_site.waterbody > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Trails: <strong>{{selected_site.trails}}</strong></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Trail Miles: <strong>{{selected_site.trail_miles}}</strong></h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Picnic Area: <strong>{% if selected_site.picnic_area > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Sports Facilities: <strong>{% if selected_site.sports_facilities > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Swimming Facilities: <strong>{% if selected_site.swimming_facilities > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Boat Launch: <strong>{% if selected_site.boat_launch > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Bathrooms: <strong>{% if selected_site.bathrooms > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Playgrounds: <strong>{% if selected_site.playgrounds > 0 %} Yes {% else %} No {% endif %}</strong></h5>
+                        </div>
+                    </div>
+                {% else %}
+                    <h1>No Site Selected</h1>
+                {% endif %}
             </div>
+            {% plotly_app name="SiteSelection" ratio=0.5 initial_arguments=dash_context %}
         </div>
     </div>
 </div>
