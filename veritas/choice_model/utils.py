@@ -29,7 +29,6 @@ class ChoiceModel():
 
             new_distance_values.append(distance)
         self.distances.loc[site.name] = new_distance_values
-        print(self.distances.tail())
 
     def _add_to_calibration(self, site_name):
         self.calibration.loc[site_name] = 0
@@ -106,9 +105,9 @@ class ChoiceModel():
         self.visitation_probability[self.visitation_probability < 0] = 0
 
 
-    def get_site_choice_visit_prob(self, modified_sites):
+    def get_site_visits(self, modified_sites):
         """
-        Returns dictionary with sites and their respective visit probability
+        Returns dictionary with sites and their respective visits from population
         """
         # replace old site_data with modified sites
         modified_site_data = self._get_updated_site_df(modified_sites)
@@ -116,13 +115,14 @@ class ChoiceModel():
         # update model values
         self._update_model_values(modified_site_data)
 
-        # convert the average visitation probabilites into dictionary
-        average_visitation_prob = self.visitation_probability.mean(axis=1)
-        site_choice_probs = {}
-        for name, prob in zip(average_visitation_prob.index.to_list(), average_visitation_prob.values.tolist()):
-            site_choice_probs[name] = prob
+        # use visitation probabilities along with population numbers to find number of people
+        visits = self.visitation_probability.multiply(self.population.sum(axis=1)).sum(axis=1)
 
-        return site_choice_probs
+        visits_dict = {}
+        for name, prob in zip(visits.index.to_list(), visits.values.tolist()):
+            visits_dict[name] = prob
+
+        return visits_dict
 
     def get_equity_evaluation(self, modified_sites):
         """
