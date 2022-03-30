@@ -1,4 +1,5 @@
 {% extends 'main.html' %}
+{% load plotly_dash %}
 {% block content %}
 <div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -21,7 +22,7 @@
     </nav>
     <div class="row py-2 align-items-center">
         <div class="col-md-8 justify-content-center">
-            <h1>Saved Models</h1>
+            <h1>Your Saved Models</h1>
         </div>
         <div class="col-md-4">
             <a class="btn btn-success" role="button" href="{% url 'bundle-create' %}">Create New Model</a>
@@ -55,5 +56,37 @@
         <h3>No Bundles Created</h3>
         {% endfor %}
     </table>
+    <h1>Baseline Model</h1>
+    <div class="row py-2 align-items-center">
+        <div class="col-md-8 justify-content-center">
+            <p>Not happy with our baseline? Feel free to recalibrate with your own inputs</p>
+        </div>
+        <div class="col-md-4">
+            <a class="btn btn-outline-primary" role="button" href="">Recalibrate Baseline</a>
+        </div>
+    </div>
+    <div class="row align-items-center">
+        <div class="d-flex col-md-4">
+            <h5>Equity Evaluation</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Baseline Black</th>
+                        <th>Baseline Other</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{baseline_equity_black}}</td>
+                        <td>{{baseline_equity_other}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row pb-4 align-items-center">
+        <h5>Site Choice Probabilities</h5>
+        {% plotly_app name="SiteChoiceProb" ratio=0.2 initial_arguments=dash_context %}
+    </div>
 </div>
 {% endblock content %}
