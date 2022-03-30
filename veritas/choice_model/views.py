@@ -11,7 +11,7 @@ from itertools import chain
 
 from .dashapps import site_choice_prob, site_selection
 from .models import ModifiedSitesBundle, Site, ModifiedSite
-from .utils import ChoiceModel
+from .utils import ChoiceModel, create_SCP_bubble_plot_fig, create_SCP_map_scatter_plot_fig
 
 
 
@@ -19,6 +19,26 @@ class BundleList(LoginRequiredMixin, ListView):
     model = ModifiedSitesBundle
     context_object_name = 'bundles'
     template_name = 'bundles.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        choice_model = ChoiceModel()
+        baseline_site_visits = choice_model.get_site_visits([])
+        baseline_visitation_prob = choice_model.get_visitation_probability([])
+        baseline_equity_evaluation  = choice_model.get_equity_evaluation([])
+
+        bubble_fig = create_SCP_bubble_plot_fig(baseline_site_visits)
+        map_scatter_fig = create_SCP_map_scatter_plot_fig(baseline_visitation_prob, choice_model.site_and_location)
+
+        context['dash_context'] = {
+            'bubble-plot': {'figure': bubble_fig},
+            'map-scatter-plot': {'figure': map_scatter_fig}
+        }
+        context['baseline_equity_black'] = round(baseline_equity_evaluation['average_utility_black'], 3)
+        context['baseline_equity_other'] = round(baseline_equity_evaluation['average_utility_other'], 3)
+
+        return context
 
     def get_queryset(self):
         return super().get_queryset().filter(history_id=self.request.user)
@@ -37,46 +57,13 @@ class BundleDetail(LoginRequiredMixin, DetailView):
         modified_sites = list(ModifiedSite.objects.all().filter(bundle_id=bundle_id))
 
         choice_model = ChoiceModel()
-        site_choice_probs = choice_model.get_site_visits(modified_sites)
-        visitation_probability = choice_model.get_visitation_probability(modified_sites)
-
+        site_visits = choice_model.get_site_visits(modified_sites)
+        visitation_prob = choice_model.get_visitation_probability(modified_sites)
         baseline_equity_evaluation  = choice_model.get_equity_evaluation([])
         equity_evaluation = choice_model.get_equity_evaluation(modified_sites)
 
-        # for bubble plot
-        site_choice_prob_labels = list(site_choice_probs.keys())
-        site_choice_prob_values = list(site_choice_probs.values())
-        site_choice_prob_sizes = [site/1000 for site in site_choice_prob_values]
-        bubble_fig = go.Figure(data=[go.Scatter(
-            x=site_choice_prob_labels,
-            y=site_choice_prob_values,
-            marker_size=site_choice_prob_sizes,
-            mode='markers',
-        )])
-        bubble_fig.update_layout(
-            margin=dict(l=20, r=20, b=5, t=5),
-        )
-
-        # for scatter map
-        site_location_and_prob = pd.merge(
-            visitation_probability.mean(axis=1).to_frame(),
-            choice_model.site_and_location,
-            left_index=True, right_index=True
-        )
-        site_location_and_prob = site_location_and_prob.rename(columns={0: 'Visitation Probability'})
-        site_location_and_prob = site_location_and_prob.reset_index()
-        map_scatter_fig = px.scatter_mapbox(
-            site_location_and_prob,
-            lat='latitude', 
-            lon='longitude', 
-            color='Visitation Probability', 
-            mapbox_style='open-street-map',
-            size='Visitation Probability', 
-            hover_name='name'
-        )
-        map_scatter_fig.update_layout(
-            margin={'l':0, 'r': 0, 't':0, 'b':0}
-        )
+        bubble_fig = create_SCP_bubble_plot_fig(site_visits)
+        map_scatter_fig = create_SCP_map_scatter_plot_fig(visitation_prob, choice_model.site_and_location)
 
         context['dash_context'] = {
             'bubble-plot': {'figure': bubble_fig},

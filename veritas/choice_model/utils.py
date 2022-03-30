@@ -1,6 +1,8 @@
 import h3
 import numpy as np
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 
 from pathlib import Path
 
@@ -191,3 +193,49 @@ class ChoiceModel():
         self._update_model_values(modified_site_data)
 
         return self.visitation_probability
+
+
+def create_bubble_plot_fig(labels, values, sizes):
+    bubble_fig = go.Figure(data=[go.Scatter(
+        x=labels,
+        y=values,
+        marker_size=sizes,
+        mode='markers'
+    )])
+    return bubble_fig
+
+
+def create_SCP_bubble_plot_fig(site_choice_visits):
+    SCP_labels = list(site_choice_visits.keys())
+    SCP_values = list(site_choice_visits.values())
+    SCP_sizes = [site/1000 for site in SCP_values]
+
+    bubble_fig = create_bubble_plot_fig(SCP_labels, SCP_values, SCP_sizes)
+
+    bubble_fig.update_layout(margin={'l': 20, 'r': 20, 'b': 5, 't': 5})
+    
+    return bubble_fig
+
+
+def create_SCP_map_scatter_plot_fig(visitation_prob, site_and_locations):
+    site_location_and_prob = pd.merge(
+        visitation_prob.mean(axis=1).to_frame(),
+        site_and_locations,
+        left_index=True, right_index=True
+    )
+
+    site_location_and_prob = site_location_and_prob.rename(columns={0: 'Visitation Probability'})
+    site_location_and_prob = site_location_and_prob.reset_index()
+
+    map_scatter_fig = px.scatter_mapbox(
+        site_location_and_prob,
+        lat='latitude', 
+        lon='longitude', 
+        color='Visitation Probability', 
+        mapbox_style='open-street-map',
+        size='Visitation Probability', 
+        hover_name='name'
+    )
+    map_scatter_fig.update_layout(margin={'l':0, 'r': 0, 't':0, 'b':0})
+
+    return map_scatter_fig
