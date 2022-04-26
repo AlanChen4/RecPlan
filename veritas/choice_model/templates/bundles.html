@@ -1,40 +1,20 @@
 {% extends 'main.html' %}
 {% load plotly_dash %}
 {% block content %}
-<div>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Veritas</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                {% if request.user.is_authenticated %}
-                <a class="nav-item nav-link" href="{% url 'bundles' %}">Home</a>
-                <a class="nav-item nav-link" href="{% url 'profile' request.user.pk %}">Profile</a>
-                <a class="nav-item nav-link" href="#">Settings</a>
-                {% else %}
-                <a href="{% url 'login' %}">Login</a>
-                {% endif %}
-                <a class="nav-item nav-link" href="#">Help</a>
-            </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <h1>My models</h1>
         </div>
-    </nav>
-    <div class="row py-2 align-items-center">
-        <div class="col-md-8 justify-content-center">
-            <h1>Your Saved Models</h1>
-        </div>
-        <div class="col-md-4">
-            <a class="btn btn-success" role="button" href="{% url 'bundle-create' %}">Create New Model</a>
+        <div class="d-flex col-md-3">
+            <a class="btn btn-success my-2 ms-auto" role="button" href="{% url 'bundle-create' %}">Create New Model</a>
         </div>
     </div>
-    <table class="table">
+    <table class="table mt-3">
         <thead class="bg-dark text-white">
             <tr>
-                <th>Nickname</th>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th class="col-md-8"c>model name</th>
+                <th class="col-md-4">actions</th>
             </tr>
         </thead>
         <tbody>
@@ -42,13 +22,40 @@
             <tr>
                 <td>{{bundle.nickname}}</td>
                 <td>
-                    <a class="btn btn-outline-success py-0" href="{% url 'bundle' bundle.bundle_id %}">Calculate</a>
-                </td>
-                <td>
-                    <a class="btn btn-outline-primary py-0" href="{% url 'bundle-update' bundle.bundle_id %}">Modify</a>
-                </td>
-                <td>
-                    <a class="btn btn-outline-danger py-0" href="{% url 'bundle-delete' bundle.bundle_id %}">Delete</a>
+                    <a class="btn btn-outline-success border-0" href="{% url 'bundle' bundle.bundle_id %}">
+                        calculate
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calculator" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                            <rect x="8" y="7" width="8" height="3" rx="1"></rect>
+                            <line x1="8" y1="14" x2="8" y2="14.01"></line>
+                            <line x1="12" y1="14" x2="12" y2="14.01"></line>
+                            <line x1="16" y1="14" x2="16" y2="14.01"></line>
+                            <line x1="8" y1="17" x2="8" y2="17.01"></line>
+                            <line x1="12" y1="17" x2="12" y2="17.01"></line>
+                            <line x1="16" y1="17" x2="16" y2="17.01"></line>
+                        </svg>
+                    </a>
+                    <a class="btn btn-outline-primary border-0" href="{% url 'bundle-update' bundle.bundle_id %}">
+                        modify
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                            <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                            <path d="M16 5l3 3"></path>
+                        </svg>
+                    </a>
+                    <a class="btn btn-outline-danger border-0" href="{% url 'bundle-delete' bundle.bundle_id %}">
+                        delete
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                            <line x1="4" y1="7" x2="20" y2="7"></line>
+                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                        </svg>
+                    </a>
                 </td>
             </tr>
         </tbody>
@@ -56,37 +63,49 @@
         <h3>No Bundles Created</h3>
         {% endfor %}
     </table>
-    <h1>Baseline Model</h1>
-    <div class="row py-2 align-items-center">
-        <div class="col-md-8 justify-content-center">
-            <p>Not happy with our baseline? Feel free to recalibrate with your own inputs</p>
-        </div>
-        <div class="col-md-4">
-            <a class="btn btn-outline-primary" role="button" href="">Recalibrate Baseline</a>
-        </div>
+    <div class="d-flex">
+        <button class="btn btn-outline-primary border-0 ms-auto" data-bs-toggle="collapse" data-bs-target="#collapse-baseline">
+            toggle baseline model
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                <circle cx="12" cy="12" r="2"></circle>
+                <path d="M12 19c-4 0 -7.333 -2.333 -10 -7c2.667 -4.667 6 -7 10 -7s7.333 2.333 10 7c-.42 .736 -.858 1.414 -1.311 2.033"></path>
+                <path d="M15 19l2 2l4 -4"></path>
+            </svg>
+        </button>
     </div>
-    <div class="row align-items-center">
-        <div class="d-flex col-md-4">
-            <h5>Equity Evaluation</h5>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Baseline Black</th>
-                        <th>Baseline Other</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>{{baseline_equity_black}}</td>
-                        <td>{{baseline_equity_other}}</td>
-                    </tr>
-                </tbody>
-            </table>
+    <div class="collapse" id="collapse-baseline">
+        <div class="row py-5">
+            <div class="col-md-4">
+                <h5 class="text-center">Equity Evaluation</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Baseline Black</th>
+                            <th>Baseline Other</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{baseline_equity_black}}</td>
+                            <td>{{baseline_equity_other}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-8">
+                <h5 class="text-center">Site Choice Probabilities</h5>
+                {% plotly_app name="SiteChoiceProb" ratio=0.25 initial_arguments=dash_context %}
+            </div>
         </div>
-    </div>
-    <div class="row pb-4 align-items-center">
-        <h5>Site Choice Probabilities</h5>
-        {% plotly_app name="SiteChoiceProb" ratio=0.2 initial_arguments=dash_context %}
+        <div class="row p-4">
+            <div class="col-md-8">
+                <p>Not happy with our baseline? Feel free to recalibrate with your own inputs</p>
+            </div>
+            <div class="col-md-4">
+                <a class="btn btn-outline-primary" role="button" href="">Recalibrate Baseline</a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}
