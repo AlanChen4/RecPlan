@@ -1,10 +1,10 @@
-{% extends 'main.html' %}
+{% extends 'choice_model/main.html' %}
 {% load plotly_dash %}
 {% block content %}
 <div class="container">
     <div class="row">
         <div class="col-md-9">
-            <h1>My models</h1>
+            <h1>My Models</h1>
         </div>
         <div class="d-flex col-md-3">
             <a class="btn btn-success my-2 ms-auto" role="button" href="{% url 'bundle-create' %}">Create New Model</a>
@@ -13,8 +13,8 @@
     <table class="table mt-3">
         <thead class="bg-dark text-white">
             <tr>
-                <th class="col-md-8"c>model name</th>
-                <th class="col-md-4">actions</th>
+                <th class="col-md-8"c>Model Name</th>
+                <th class="col-md-4">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -23,7 +23,7 @@
                 <td>{{bundle.nickname}}</td>
                 <td>
                     <a class="btn btn-outline-success border-0" href="{% url 'bundle' bundle.bundle_id %}">
-                        calculate
+                        Calculate
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calculator" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <rect x="4" y="3" width="16" height="18" rx="2"></rect>
@@ -37,7 +37,7 @@
                         </svg>
                     </a>
                     <a class="btn btn-outline-primary border-0" href="{% url 'bundle-update' bundle.bundle_id %}">
-                        modify
+                        Edit
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
@@ -46,7 +46,7 @@
                         </svg>
                     </a>
                     <a class="btn btn-outline-danger border-0" href="{% url 'bundle-delete' bundle.bundle_id %}">
-                        delete
+                        Delete
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                             <line x1="4" y1="7" x2="20" y2="7"></line>
@@ -65,7 +65,7 @@
     </table>
     <div class="d-flex">
         <button class="btn btn-outline-primary border-0 ms-auto" data-bs-toggle="collapse" data-bs-target="#collapse-baseline">
-            toggle baseline model
+            Toggle Baseline Model
             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-eye-check" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                 <circle cx="12" cy="12" r="2"></circle>

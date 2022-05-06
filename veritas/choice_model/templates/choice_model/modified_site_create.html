@@ -1,0 +1,6 @@
+{% extends 'choice_model/main.html' %}
+{% load plotly_dash %}
+{% load crispy_forms_tags %}
+{% block content%}
+{% plotly_app name="AddSite" ratio=0.7 initial_arguments=dash_context %}
+{% endblock content%}
