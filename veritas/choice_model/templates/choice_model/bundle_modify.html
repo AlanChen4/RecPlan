@@ -18,7 +18,7 @@
             </form>
         </div>
         <div class="col md-6">
-            <a class="btn btn-outline-success" href="{% url 'modified-site-create' bundle_id 'new-site' %}">Add New Site</a>
+            <a class="btn btn-outline-success" href="{% url 'site-create' bundle_id %}">Add New Site</a>
         </div>
     </div>
     <div class="row">
@@ -36,7 +36,11 @@
                     <tr>
                         <td>{{site.name}}</td>
                         <td>
-                            <a href="{% url 'modified-site-create' bundle_id site.name %}">Modify</a>
+                            {% if site.name in modified_site_names %}
+                                <a href="{% url 'modified-site-update' bundle_id site.name %}">Modify</a>
+                            {% else  %}
+                                <a href="{% url 'modified-site-create' bundle_id site.name %}">Modify</a>
+                            {% endif %}
                         </td>
                         <td>
                             <a href="{% url 'bundle-update' bundle_id  %}?show-site={{site.name}}">Show</a>

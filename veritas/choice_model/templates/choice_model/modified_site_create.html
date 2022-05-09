@@ -1,6 +1,52 @@
 {% extends 'choice_model/main.html' %}
-{% load plotly_dash %}
 {% load crispy_forms_tags %}
 {% block content%}
-{% plotly_app name="AddSite" ratio=0.7 initial_arguments=dash_context %}
+<div class="container">
+    <h1>Modify <strong>{{ site_name }}</strong></h1>
+    <form method="post" class="row">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-8">
+                {{ form.name|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.acres|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{ form.trails|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.trail_miles|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.bathrooms|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{ form.sports_facilities|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.swimming_facilities|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.boat_launch|as_crispy_field }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                {{ form.waterbody|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.picnic_area|as_crispy_field }}
+            </div>
+            <div class="col-md-4">
+                {{ form.playgrounds|as_crispy_field }}
+            </div>
+        </div>
+        <input class="btn btn-outline-success" value="Modify Site" type="submit">
+    </form>
+</div>
 {% endblock content%}

@@ -1,3 +1,4 @@
+import json
 import h3
 import numpy as np
 import pandas as pd
@@ -5,6 +6,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 from pathlib import Path
+from shapely.geometry import Point
+from shapely.geometry.polygon import Polygon
 
 
 class ChoiceModel():
@@ -16,6 +19,7 @@ class ChoiceModel():
         self.distances = pd.read_parquet(Path().resolve() / 'choice_model/data/distances.parquet')
         self.calibration = pd.read_parquet(Path().resolve() / 'choice_model/data/calibration.parquet')
         self.population = pd.read_parquet(Path().resolve() / 'choice_model/data/model_population.parquet')
+        self.population_trips = (10 * 15.79 / 11.29) * self.population
 
     def _add_to_distances(self, site):
         new_distance_values = []
@@ -130,43 +134,14 @@ class ChoiceModel():
         """
         Returns dictionary the equity evaluations
         """
-        # replace old site_data with modified sites
-        modified_site_data = self._get_updated_site_df(modified_sites)
-
-        # update model values
-        self._update_model_values(modified_site_data)
-
-        site_attractiveness = self.site_attractiveness
-        site_attractiveness[site_attractiveness == 0] = -1000
-        utility_index = np.log(self.exp_site_attractiveness)
-        
-        # Underserved Evaluation
-        percent_black = self.population['Black'] / (self.population['Black'] + self.population['Other'])
-        percent_other = self.population['Other'] / (self.population['Black'] + self.population['Other'])
-
-        underserved_evaluation_black = percent_black / (self.visitation_probability * utility_index).sum(axis=0)
-        underserved_evaluation_other = percent_other / (self.visitation_probability * utility_index).sum(axis=0)
-
-        # Population Trips
-        trips_per_person = 10 * 15.79 / 11.29
-        population_trips = self.population * trips_per_person
-
-        # Total Trips by Equity Group
-        total_trips_by_equity_group = population_trips.sum()
-
-        # All Trips
-        all_trips_black = population_trips['Black'] * self.visitation_probability
-        all_trips_other = population_trips['Other'] * self.visitation_probability
-        all_trips_total = all_trips_black + all_trips_other
-
-        # Utility Weighted Trips
-        utility_weighted_trips_black = all_trips_black * utility_index
-        utility_weighted_trips_other = all_trips_other * utility_index
-        utility_weighted_trips_total = all_trips_total * utility_index
+        utility_weighted_trips_black, utility_weighted_trips_other = self.get_utility_by_block(modified_sites=modified_sites)
 
         # Total Utility by Equity Group
         total_utility_black = utility_weighted_trips_black.sum().sum()
         total_utility_other = utility_weighted_trips_other.sum().sum()
+
+        # Total Trips by Equity Group
+        total_trips_by_equity_group = self.population_trips.sum()
 
         # Average Utility by Equity Group
         average_utility_black = total_utility_black / total_trips_by_equity_group['Black']
@@ -193,6 +168,35 @@ class ChoiceModel():
         self._update_model_values(modified_site_data)
 
         return self.visitation_probability
+
+    def get_utility_by_block(self, modified_sites=[]):
+        # replace old site_data with modified sites
+        modified_site_data = self._get_updated_site_df(modified_sites)
+
+        # update model values
+        self._update_model_values(modified_site_data)
+
+        site_attractiveness = self.site_attractiveness
+        site_attractiveness[site_attractiveness == 0] = -1000
+        utility_index = np.log(self.exp_site_attractiveness)
+        
+        # Underserved Evaluation
+        percent_black = self.population['Black'] / (self.population['Black'] + self.population['Other'])
+        percent_other = self.population['Other'] / (self.population['Black'] + self.population['Other'])
+
+        underserved_evaluation_black = percent_black / (self.visitation_probability * utility_index).sum(axis=0)
+        underserved_evaluation_other = percent_other / (self.visitation_probability * utility_index).sum(axis=0)
+
+        # All Trips
+        all_trips_black = self.population_trips['Black'] * self.visitation_probability
+        all_trips_other = self.population_trips['Other'] * self.visitation_probability
+        all_trips_total = all_trips_black + all_trips_other
+
+        # Utility Weighted Trips
+        utility_weighted_trips_black = all_trips_black * utility_index
+        utility_weighted_trips_other = all_trips_other * utility_index
+
+        return utility_weighted_trips_black, utility_weighted_trips_other
 
 
 def create_bubble_plot_fig(labels, values, sizes):
@@ -239,3 +243,30 @@ def create_SCP_map_scatter_plot_fig(visitation_prob, site_and_locations):
     map_scatter_fig.update_layout(margin={'l':0, 'r': 0, 't':0, 'b':0})
 
     return map_scatter_fig
+
+def create_add_site_plot_fig(geojson=Path().resolve() / 'choice_model/data/wake_bg.json'):
+    # calculate sum of equity for each block
+    cm = ChoiceModel()
+    bg_utility_black = cm.get_utility_by_block()[0].sum().to_frame()
+    bg_utility_white = cm.get_utility_by_block()[1].sum().to_frame()
+
+    # convert to format that can be read by choropleth mapbox
+    bg_utility_black['GEOID'] = bg_utility_black.index.str.replace(', ', '').str[:6]
+    bg_utility_black = bg_utility_black.rename(columns={0: 'black_utility'})
+
+    with open(geojson) as f:
+        geojson_data = json.load(f)
+
+    fig = px.choropleth_mapbox(bg_utility_black, 
+                               geojson=geojson_data, 
+                               locations='GEOID', 
+                               color='black_utility', 
+                               featureidkey='properties.GEOID',
+                               color_continuous_scale="blugrn",
+                               mapbox_style="carto-positron",
+                               zoom=8, 
+                               center={"lat": 35.7, "lon": -78.5},
+                               opacity=0.8)
+    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+    return fig

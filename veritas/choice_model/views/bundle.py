@@ -147,6 +147,9 @@ class BundleUpdate(LoginRequiredMixin, UpdateView):
                 'map-plot': {'figure': map_scatter_fig}
             }
 
+        # include name of sites that have already been modified
+        context['modified_site_names'] = ModifiedSite.objects.filter(bundle_id=self.object.bundle_id).values_list('name', flat=True)
+
         return context
 
     def get_queryset(self):
