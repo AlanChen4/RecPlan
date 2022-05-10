@@ -1,6 +1,6 @@
 import uuid
-from django.contrib.auth.models import User
 from django.db import models
+from authentication.models import CustomUser
 
 
 class Site(models.Model):
@@ -24,7 +24,7 @@ class Site(models.Model):
 
 class ModifiedSitesBundle(models.Model):
     bundle_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    history_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    history_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=100)
 
 

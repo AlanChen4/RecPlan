@@ -7,7 +7,7 @@
             <h1>My Models</h1>
         </div>
         <div class="d-flex col-md-3">
-            <a class="btn btn-success my-2 ms-auto" role="button" href="{% url 'bundle-create' %}">Create New Model</a>
+            <a class="btn btn-black my-2 ms-auto" href="{% url 'bundle-create' %}">Create New Model</a>
         </div>
     </div>
     <table class="table mt-3">
@@ -22,7 +22,7 @@
             <tr>
                 <td>{{bundle.nickname}}</td>
                 <td>
-                    <a class="btn btn-outline-success border-0" href="{% url 'bundle' bundle.bundle_id %}">
+                    <a class="btn btn-black border-0" href="{% url 'bundle' bundle.bundle_id %}">
                         Calculate
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calculator" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -36,7 +36,7 @@
                             <line x1="16" y1="17" x2="16" y2="17.01"></line>
                         </svg>
                     </a>
-                    <a class="btn btn-outline-primary border-0" href="{% url 'bundle-update' bundle.bundle_id %}">
+                    <a class="btn btn-black border-0" href="{% url 'bundle-update' bundle.bundle_id %}">
                         Edit
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -45,7 +45,7 @@
                             <path d="M16 5l3 3"></path>
                         </svg>
                     </a>
-                    <a class="btn btn-outline-danger border-0" href="{% url 'bundle-delete' bundle.bundle_id %}">
+                    <a class="btn btn-black border-0" href="{% url 'bundle-delete' bundle.bundle_id %}">
                         Delete
                         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-trash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                             <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>

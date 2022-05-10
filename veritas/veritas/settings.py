@@ -9,6 +9,8 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
+import dj_database_url
+import os
 from django.urls import reverse_lazy
 from pathlib import Path
 
@@ -38,17 +40,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # 3rd party
     'bootstrap4',
     'crispy_forms',
     'crispy_bootstrap5',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
+    'whitenoise.runserver_nostatic',
 
-    # my apps
     'authentication',
     'choice_model'
 ]
 
+AUTH_USER_MODEL = 'authentication.CustomUser'
 
 # used with installed app crispy_forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
@@ -75,6 +77,7 @@ MIDDLEWARE = [
       'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = reverse_lazy('login')
 
 ROOT_URLCONF = 'veritas.urls'
@@ -101,12 +104,8 @@ WSGI_APPLICATION = 'veritas.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 
 # Password validation
@@ -145,8 +144,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-STATICFILES_FINDERS = [
+# location where django collect all static files
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 
@@ -175,3 +178,6 @@ PLOTLY_COMPONENTS = [
     # Other components, as needed
     'dash_bootstrap_components',
 ]
+
+if os.environ.get('DJANGO_DEVELOPMENT'):
+    from .local_settings import *
