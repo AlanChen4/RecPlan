@@ -12,7 +12,7 @@ from choice_model.dashapps import site_choice_prob, site_selection, add_site
 from choice_model.models import ModifiedSitesBundle, Site, ModifiedSite
 from choice_model.utils import ChoiceModel, create_SCP_bubble_plot_fig, create_SCP_map_scatter_plot_fig, create_add_site_plot_fig
 
-from dash import dcc
+import dash_core_components as dcc
 from pathlib import Path
 
 

@@ -1,7 +1,8 @@
 import dash_bootstrap_components as dbc
 import pandas as pd
 
-from dash import dcc, html
+import dash_core_components as dcc
+import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from django_plotly_dash import DjangoDash
 from django.urls import reverse_lazy
@@ -25,82 +26,82 @@ app.layout = html.Div(id='output', className="container mt-5", children=[
             dbc.Col([
                 dbc.Label('Site Name'),
                 dbc.Input(id='site_name', name='site_name', value='')
-            ], class_name='col-md-5'),
+            ], className='col-md-5'),
             dbc.Col([
                 dbc.Label('Acres'),
                 dbc.Input(id='acres', name='acres', value=0)
-            ], class_name='col-md-2'),
+            ], className='col-md-2'),
             dbc.Col([
                 dbc.Label('Selected Block'),
-                dbc.Input(id='geoid', name='geoid', readonly=True, value='')
-            ], class_name='col-md-5'),
-        ], class_name='my-2'),
+                dbc.Input(id='geoid', name='geoid', value='')
+            ], className='col-md-5'),
+        ], className='my-2'),
         dbc.Row([
             dbc.Col([
                 dbc.Label('Trails'),
                 dbc.Input(id='trails', name='trails', type='number', value=0),
-            ], class_name='col-md-4'),
+            ], className='col-md-4'),
             dbc.Col([
                 dbc.Label('Trail Miles'),
                 dbc.Input(id='trail_miles', name='trail_miles', type='number', value=0),
-            ], class_name='col-md-4'),
+            ], className='col-md-4'),
             dbc.Col([
                 dbc.Label('Bathrooms'),
                 dbc.Input(id='bathrooms', name='bathrooms', type='number', value=0),
-            ], class_name='col-md-4'),
-        ], class_name='my-2'),
+            ], className='col-md-4'),
+        ], className='my-2'),
         dbc.Row([
             dbc.Col([
                 dbc.Label('Picnic Area'),
                 dbc.RadioItems(id='picnic_area', options=[
                     {'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
-                ], class_name='form-check-inline', name='picnic_area', value=1)
-            ], class_name='col-md-4'),
+                ], className='form-check-inline', name='picnic_area', value=1)
+            ], className='col-md-4'),
             dbc.Col([
                 dbc.Label('Sports Facilities'),
                 dbc.RadioItems(id='sports_facilities', options=[
                     {'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
-                ], class_name='form-check-inline', name='sports_facilities', value=1)
-            ], class_name='col-md-4'),
+                ], className='form-check-inline', name='sports_facilities', value=1)
+            ], className='col-md-4'),
             dbc.Col([
                 dbc.Label('Swimming Facilities'),
                 dbc.RadioItems(id='swimming_facilities', options=[
                     {'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
-                ], class_name='form-check-inline', name='swimming_facilities', value=1)
-            ], class_name='col-md-4'),
-        ], class_name='my-2'),
+                ], className='form-check-inline', name='swimming_facilities', value=1)
+            ], className='col-md-4'),
+        ], className='my-2'),
         dbc.Row([
             dbc.Col([
                 dbc.Label('Boat Launch'),
                 dbc.RadioItems(id='boat_launch', options=[
                     {'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
-                ], class_name='form-check-inline', name='boat_launch', value=1)
-            ], class_name='col-md-4'),
+                ], className='form-check-inline', name='boat_launch', value=1)
+            ], className='col-md-4'),
             dbc.Col([
                 dbc.Label('Waterbody'),
                 dbc.RadioItems(id='waterbody', options=[
                     {'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
-                ], class_name='form-check-inline', name='waterbody', value=1)
-            ], class_name='col-md-4'),
+                ], className='form-check-inline', name='waterbody', value=1)
+            ], className='col-md-4'),
             dbc.Col([
                 dbc.Label('Playgrounds'),
                 dbc.RadioItems(id='playgrounds', options=[
                     {'label': 'Yes', 'value': 1},
                     {'label': 'No', 'value': 0},
-                ], class_name='form-check-inline', name='playgrounds', value=1)
-            ], class_name='col-md-4'),
-        ], class_name='my-2'),
+                ], className='form-check-inline', name='playgrounds', value=1)
+            ], className='col-md-4'),
+        ], className='my-2'),
         dbc.Row([
             html.Button('Create New Site', type='submit', id='submit-btn', className='btn btn-outline-primary', form='site-form', formMethod='POST', formAction='/site/dash/')
-        ], class_name='m-2'),
+        ], className='m-2'),
         dbc.Row([
             dcc.Graph(id='add-site-plot', figure=None, style=GRAPH_STYLE)
-        ], class_name='mx-2'),
+        ], className='mx-2'),
         html.Div(id="hidden-div-for-redirect"),
     ], id='site-form', className='mx-4'),
 ])
