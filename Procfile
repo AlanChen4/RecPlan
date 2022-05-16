@@ -1,1 +1,1 @@
-web: python quarterly/manage.py runserver 0.0.0.0:$PORT
+web: python veritas/manage.py runserver 0.0.0.0:$PORT
