@@ -4,7 +4,7 @@ from dash.dependencies import Input, Output
 from django_plotly_dash import DjangoDash
 
 
-app = DjangoDash('SiteChoiceProb')
+app = DjangoDash('SiteChoiceProb', add_bootstrap_links=True)
 
 graph_style = {
     'height': '50%',

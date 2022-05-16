@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'crispy_forms',
     'crispy_bootstrap5',
+    'dpd_static_support',
     'django_plotly_dash.apps.DjangoPlotlyDashConfig',
     'whitenoise.runserver_nostatic',
 
@@ -147,7 +148,8 @@ STATIC_URL = 'static/'
 # location where django collect all static files
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -172,6 +174,7 @@ PLOTLY_COMPONENTS = [
 
     # django-plotly-dash components
     'dpd_components',
+
     # static support if serving local assets
     'dpd_static_support',
 
