@@ -23,8 +23,8 @@ class Site(models.Model):
 
 
 class ModifiedSitesBundle(models.Model):
-    bundle_id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    history_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=100)
 
 
@@ -33,8 +33,8 @@ CHOICES = (
     (1, 'Yes')
 )
 class ModifiedSite(models.Model):
-    _id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    bundle_id = models.ForeignKey('ModifiedSitesBundle', on_delete=models.CASCADE)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    bundle = models.ForeignKey('ModifiedSitesBundle', on_delete=models.CASCADE)
     latitude = models.FloatField()
     longitude = models.FloatField()
     name = models.CharField(max_length=100)
@@ -48,3 +48,17 @@ class ModifiedSite(models.Model):
     waterbody = models.IntegerField(choices=CHOICES)
     bathrooms = models.IntegerField()
     playgrounds = models.IntegerField(choices=CHOICES)
+
+
+class BaselineModel(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    selected = models.BooleanField(default=True)
+
+
+class BaselineSite(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    baseline_model = models.ForeignKey(BaselineModel, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    visits = models.FloatField()
