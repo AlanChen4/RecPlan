@@ -1,10 +1,14 @@
 from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
+from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView, UpdateView
 from django.shortcuts import redirect
+from django.urls import reverse_lazy
+
+from .forms import RegisterForm
+from .models import CustomUser
 
 
 class CustomLoginView(LoginView):
@@ -19,7 +23,8 @@ class CustomLoginView(LoginView):
 
 class RegisterPage(FormView):
     template_name = 'authentication/register.html'
-    form_class = UserCreationForm
+    form_class = RegisterForm
+    success_url = reverse_lazy('login')
 
     def form_valid(self, form):
         user = form.save()
@@ -29,13 +34,13 @@ class RegisterPage(FormView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('bundles')
+            return redirect('portfolios')
         return super().get(*args, **kwargs)
 
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
-    model = User
-    fields = ['email', 'username', 'first_name', 'last_name']
+    model = CustomUser
+    fields = ['email', 'first_name', 'last_name']
     template_name = 'authentication/profile.html'
 
     def form_valid(self, form):
@@ -45,4 +50,8 @@ class UserUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
     def get_queryset(self):
-        return User.objects.filter(pk=self.request.user.pk)
+        return CustomUser.objects.filter(pk=self.request.user.pk)
+
+
+class LandingPageView(TemplateView):
+    template_name = 'authentication/landing_page.html'

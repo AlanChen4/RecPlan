@@ -11,6 +11,9 @@ urlpatterns = [
 
     path('site/<uuid:pk>/', SiteCreate.as_view(), name='site-create'),
     path('site/dash/', SiteCreateDash, name='site-create-dash'),
+    path('modified-site/<uuid:pk>/delete/', ModifiedSiteDelete.as_view(), name='modified-site-delete'),
     path('modified-site/<uuid:pk>/<str:site_name>/', ModifiedSiteCreate.as_view(), name='modified-site-create'),
     path('modified-site/<uuid:pk>/<str:site_name>/update/', ModifiedSiteUpdate.as_view(), name='modified-site-update'),
+
+    path('recalibrate/', RecalibrateBaseline, name='recalibrate-baseline')
 ]
