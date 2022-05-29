@@ -2,7 +2,6 @@
 {% load crispy_forms_tags %}
 {% block content%}
 <div class="pt-5 w-50 m-auto">
-    <a href="{% url 'bundles' %}">Go back</a>
     <form method="POST">
         {% csrf_token %}
         {{form.nickname|as_crispy_field}}

@@ -7,11 +7,17 @@
         {% csrf_token %}
         <div class="row mb-3">
             <div class="col-md-6">
+                <label for="baselineModelName">Name for recalibrated baseline</label>
+                <input type="text" id="baselineModelName" name="baselineModelName" class="form-control">
+            </div>
+            <input type="submit" value="Submit" class="btn btn-black col-md-6 mt-4">
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
                 <h5><strong>Site name</strong></h5>
             </div>
-            <div class="d-flex flex-row col-md-6">
+            <div class="col-md-6">
                 <h5><strong>Total visits</strong></h5>
-                <input type="submit" value="Submit" class="btn btn-black ms-auto">
             </div>
         </div>
         {% for site_name, site_visits in baseline_site_visits.items %}
@@ -20,7 +26,7 @@
                     <label class="form-label" for="{{ site_name }}">{{ site_name }}</label>
                 </div>
                 <div class="col-md-6">
-                    <input class="form-control" type="text" name="{{ site_name }}" id="{{ site_name }}" value="{{ site_visits }}">
+                    <input class="form-control" type="text" name="{{ site_name }} (site)" id="{{ site_name }}" value="{{ site_visits }}">
                 </div>
             </div>
         {% endfor %}

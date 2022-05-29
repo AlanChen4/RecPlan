@@ -1,9 +1,11 @@
 {% extends 'choice_model/main.html' %}
 {% load plotly_dash %}
 {% block content %}
-<div class="p-4">
+<div class="container">
     <a href="{% url 'bundles' %}">Go back</a>
-    <h1 class="py-2">Viewing <strong>{{bundle.nickname}}</strong></h1>
+    <h1>Viewing <strong>{{bundle.nickname}}</strong></h1>
+    <div class="d-flex flex-row">
+    </div>
     <div class="my-4">
         <h4>Equity Evaluation (Average Utility)</h4>
         <table class="table">

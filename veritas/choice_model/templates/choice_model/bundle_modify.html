@@ -3,11 +3,10 @@
 {% block content%}
 
 <div class="container">
-    <a href="{% url 'bundles' %}">Go back</a>
     <h1 class="py-2">Modify <strong>{{ bundle.nickname }}</strong></h1>
     <div class="row">
         <div class="col md-6">
-            <form method="GET" action="{% url 'bundle-update' bundle.bundle_id %}">
+            <form method="GET" action="{% url 'bundle-update' bundle.id %}">
                 <div class="form-check py-2">
                     <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if modified %} checked {% endif %}>
                     <label class="form-check-label" for="modified-only">
@@ -29,12 +28,18 @@
                         <th>Site Name</th>
                         <th></th>
                         <th></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for site in sites %}
                     <tr>
-                        <td>{{site.name}}</td>
+                        <td>{{ site.name }}</td>
+                        <td>
+                            {% if site.name in modified_site_names %}
+                                <a href="{% url 'modified-site-delete' site.id %}">Delete/Reset</a>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if site.name in modified_site_names %}
                                 <a href="{% url 'modified-site-update' bundle_id site.name %}">Modify</a>
@@ -48,7 +53,7 @@
                     </tr>
                 </tbody>
                 {% empty %}
-                <h3>None</h3>
+                    <h3>None</h3>
                 {% endfor %}
             </table>
         </div>
