@@ -1,0 +1,14 @@
+{% extends 'choice_model/main.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="d-flex container justify-content-center align-items-center">
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete {{ object.name }}?</p>
+        {{ form }}
+        <div class="d-flex flex-row justify-content-center">
+            <input type="submit" value="Confirm" class="btn btn-danger">
+        </div>
+    </form>
+</div>
+{% endblock content %}

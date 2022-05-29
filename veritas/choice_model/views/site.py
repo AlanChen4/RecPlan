@@ -3,14 +3,12 @@ import json
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
-from choice_model.dashapps import site_choice_prob, site_selection, add_site
-from choice_model.models import ModifiedSitesBundle, Site, ModifiedSite
-from choice_model.utils import ChoiceModel, create_SCP_bubble_plot_fig, create_SCP_map_scatter_plot_fig, create_add_site_plot_fig
+from choice_model.dashapps import *
+from choice_model.dashapp_helpers import *
+from choice_model.models import *
 
 import dash_core_components as dcc
 from pathlib import Path
@@ -134,3 +132,11 @@ class ModifiedSiteUpdate(LoginRequiredMixin, UpdateView):
         bundle_id = str(self.kwargs['pk'])
 
         return reverse_lazy('bundle-update', kwargs={'pk': bundle_id})
+
+
+class ModifiedSiteDelete(LoginRequiredMixin, DeleteView):
+    model = ModifiedSite
+    template_name = 'choice_model/modified_site_delete.html'
+
+    def get_success_url(self):
+        return reverse_lazy('bundle-update', kwargs={'pk': self.object.bundle_id.bundle_id})
