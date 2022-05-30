@@ -194,6 +194,8 @@ class ChoiceModel():
         return equity evaluations for black and non-black groups
         """
         exp_site_attractiveness = self._get_site_attractiveness()
+        exp_site_attractiveness[exp_site_attractiveness < 0] = 0
+
         site_attractiveness = np.sqrt(exp_site_attractiveness)
         site_attractiveness[site_attractiveness == 0] = -1000
         utility_index = np.log(exp_site_attractiveness)
