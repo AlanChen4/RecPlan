@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from itertools import chain
 
 from choice_model.choicemodel import ChoiceModel 
-from choice_model.dashapps import add_site, site_choice_prob, site_selection
+from choice_model.dashapps import site_choice_prob
 from choice_model.dashapp_helpers import *
 from choice_model.models import *
 
@@ -24,13 +24,17 @@ class BundleList(LoginRequiredMixin, ListView):
         choice_model = ChoiceModel(self.request.user)
         baseline_site_visits = choice_model.get_site_visits()
         baseline_visitation_prob = choice_model.get_site_visitation_probability()
+        equity_evaluation = choice_model.get_equity_evaluation()
+        equity_black, equity_other = equity_evaluation['average_utility_black'], equity_evaluation['average_utility_other']
 
-        bubble_fig = create_SCP_bubble_plot_fig(baseline_site_visits)
-        map_scatter_fig = create_SCP_map_scatter_plot_fig(baseline_visitation_prob, choice_model.get_site_locations())
+        bubble_fig = create_bubble_plot_fig(baseline_site_visits)
+        map_scatter_fig = create_map_scatter_plot_fig(baseline_visitation_prob, choice_model.get_site_locations())
+        equity_evaluation_fig = create_equity_evaluation_fig(equity_black, equity_other)
 
         context['dash_context'] = {
             'bubble-plot': {'figure': bubble_fig},
-            'map-scatter-plot': {'figure': map_scatter_fig}
+            'map-scatter-plot': {'figure': map_scatter_fig},
+            'equity-evaluation-plot': {'figure': equity_evaluation_fig},
         }
 
         return context
@@ -50,22 +54,19 @@ class BundleDetail(LoginRequiredMixin, DetailView):
         choice_model = ChoiceModel(user=self.request.user, bundle=self.object)
         site_visits = choice_model.get_site_visits()
         visitation_prob = choice_model.get_site_visitation_probability()
-        choice_model.get_equity_evaluation()
-        baseline_equity_evaluation  = choice_model.get_equity_evaluation()
         equity_evaluation = choice_model.get_equity_evaluation()
+        equity_evaluation = choice_model.get_equity_evaluation()
+        equity_black, equity_other = equity_evaluation['average_utility_black'], equity_evaluation['average_utility_other']
 
-        bubble_fig = create_SCP_bubble_plot_fig(site_visits)
-        map_scatter_fig = create_SCP_map_scatter_plot_fig(visitation_prob, choice_model.get_site_locations())
+        bubble_fig = create_bubble_plot_fig(site_visits)
+        map_scatter_fig = create_map_scatter_plot_fig(visitation_prob, choice_model.get_site_locations())
+        equity_evaluation_fig = create_equity_evaluation_fig(equity_black, equity_other)
 
         context['dash_context'] = {
             'bubble-plot': {'figure': bubble_fig},
-            'map-scatter-plot': {'figure': map_scatter_fig}
+            'map-scatter-plot': {'figure': map_scatter_fig},
+            'equity-evaluation-plot': {'figure': equity_evaluation_fig},
         }
-
-        context['baseline_equity_black'] = round(baseline_equity_evaluation['average_utility_black'], 3)
-        context['baseline_equity_other'] = round(baseline_equity_evaluation['average_utility_other'], 3)
-        context['counterfactual_equity_black'] = round(equity_evaluation['average_utility_black'], 3)
-        context['counterfactual_equity_other'] = round(equity_evaluation['average_utility_other'], 3)
 
         return context
 
@@ -80,7 +81,7 @@ class BundleCreate(LoginRequiredMixin, CreateView):
     template_name = 'choice_model/bundle_create.html'
 
     def form_valid(self, form):
-        form.instance.history_id = self.request.user
+        form.instance.user = self.request.user
         return super().form_valid(form)
 
 

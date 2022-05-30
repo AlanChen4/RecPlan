@@ -6,36 +6,25 @@ from choice_model.choicemodel import ChoiceModel
 from choice_model.constants import WAKE_BG_GEOJSON
 
 
-def create_bubble_plot_fig(labels, values, sizes):
+def create_bubble_plot_fig(site_choice_visits):
+    labels = list(site_choice_visits.keys())
+    values = list(site_choice_visits.values())
+    sizes = [site/1000 for site in values]
+
     bubble_fig = go.Figure(data=[go.Scatter(
         x=labels,
         y=values,
         marker_size=sizes,
         mode='markers'
     )])
-    return bubble_fig
 
-
-def create_SCP_bubble_plot_fig(site_choice_visits):
-    SCP_labels = list(site_choice_visits.keys())
-    SCP_values = list(site_choice_visits.values())
-    SCP_sizes = [site/1000 for site in SCP_values]
-
-    bubble_fig = create_bubble_plot_fig(SCP_labels, SCP_values, SCP_sizes)
-
-    bubble_fig.update_layout(
-        margin={'l': 20, 'r': 20, 'b': 5, 't': 5},
-    )
-    
-    bubble_fig.update_yaxes(
-        ticks="outside",
-        ticklen=50
-    )
+    bubble_fig.update_layout(margin={'l': 20, 'r': 20, 'b': 5, 't': 5},)
+    bubble_fig.update_yaxes(ticks="outside", ticklen=50)
     
     return bubble_fig
 
 
-def create_SCP_map_scatter_plot_fig(visitation_prob, site_and_locations):
+def create_map_scatter_plot_fig(visitation_prob, site_and_locations):
     site_location_and_prob = pd.merge(
         visitation_prob.mean(axis=1).to_frame(),
         site_and_locations,
@@ -57,6 +46,18 @@ def create_SCP_map_scatter_plot_fig(visitation_prob, site_and_locations):
     map_scatter_fig.update_layout(margin={'l':0, 'r': 0, 't':0, 'b':0})
 
     return map_scatter_fig
+
+
+def create_equity_evaluation_fig(black, other):
+    equity_evaluation_fig = go.Figure([go.Bar(
+        x=['Black', 'Other'],
+        y=[black, other],
+    )])
+
+    equity_evaluation_fig.update_layout(margin={'l': 20, 'r': 20, 'b': 0, 't': 0},)
+
+    return equity_evaluation_fig
+
 
 def create_add_site_plot_fig():
     # calculate sum of equity for each block

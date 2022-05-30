@@ -4,32 +4,9 @@
 <div class="container">
     <a href="{% url 'bundles' %}">Go back</a>
     <h1>Viewing <strong>{{bundle.nickname}}</strong></h1>
-    <div class="d-flex flex-row">
-    </div>
-    <div class="my-4">
-        <h4>Equity Evaluation (Average Utility)</h4>
-        <table class="table">
-            <thead class="bg-dark text-white">
-                <tr>
-                    <th>Baseline Black</th>
-                    <th>Baseline Other</th>
-                    <th>Counterfactual Black</th>
-                    <th>Counterfactual Other</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{baseline_equity_black}}</td>
-                    <td>{{baseline_equity_other}}</td>
-                    <td>{{counterfactual_equity_black}}</td>
-                    <td>{{counterfactual_equity_other}}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
     <div class="my-4">
         <h4>Site Choice Probabilities</h4>
-        {% plotly_app name="SiteChoiceProb" ratio=0.4 initial_arguments=dash_context %}
+        {% plotly_app name="SiteChoiceProb" ratio=0.50 initial_arguments=dash_context %}
     </div>
 </div>
 {% endblock content %}
