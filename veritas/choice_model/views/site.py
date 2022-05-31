@@ -6,7 +6,7 @@ from django.shortcuts import redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
-from choice_model.dashapps import *
+from choice_model.dashapps import add_site, site_choice_prob, site_selection
 from choice_model.dashapp_helpers import *
 from choice_model.models import *
 
