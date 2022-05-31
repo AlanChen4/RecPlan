@@ -6,8 +6,8 @@ from choice_model.choicemodel import ChoiceModel
 
 def RecalibrateBaseline(request):
     if request.method == 'GET':
-        cm = ChoiceModel()
-        baseline_site_visits = cm.get_site_visits(modified_sites=[])
+        choice_model = ChoiceModel(user=request.user)
+        baseline_site_visits = choice_model.get_site_visits()
 
         return render(request, 'choice_model/calibration.html', {'baseline_site_visits': baseline_site_visits})
     elif request.method == 'POST':
@@ -36,3 +36,56 @@ def RecalibrateBaseline(request):
                 )
 
         return redirect('bundles')
+
+
+def BaselineManager(request):
+    if request.method == 'GET':
+        baselines = BaselineModel.objects.filter(user=request.user)
+
+        return render(request, 'choice_model/baselines.html', {'baselines': baselines})
+
+
+def SelectBaseline(request):
+    if request.method == 'POST':
+        baselines = BaselineModel.objects.filter(user=request.user)
+        for baseline in baselines:
+            if str(baseline.id) == request.POST['baseline_id']:
+                baseline.selected = True
+            else:
+                baseline.selected = False
+            baseline.save()
+
+        return redirect('baseline-manager')
+
+    
+def EditBaseline(request, **kwargs):
+    if request.method == 'GET':
+        baseline = BaselineModel.objects.get(user=request.user, id=kwargs['baseline_id'])
+        baseline_sites = BaselineSite.objects.filter(baseline_model=baseline)
+
+        return render(request, 'choice_model/edit_baseline.html', {'baseline': baseline, 'baseline_sites': baseline_sites})
+
+    elif request.method == 'POST':
+        # fetch baseline model and also update name
+        baseline_model = BaselineModel.objects.get(user=request.user, id=kwargs['baseline_id'])
+        baseline_model.name = request.POST['baselineModelName']
+        baseline_model.save()
+
+        # update site data for baseline model
+        for key, value in request.POST.items():
+            if '(site)' in key:
+                site_name = key.replace(' (site)', '')
+                site_visits = value
+                baseline_site = BaselineSite.objects.get(baseline_model=baseline_model, name=site_name)
+                baseline_site.visits = site_visits
+                baseline_site.save()
+
+        return redirect('baseline-manager')
+
+
+def DeleteBaseline(request, **kwargs):
+    if request.method == 'POST':
+        baseline = BaselineModel.objects.get(user=request.user, id=kwargs['baseline_id'])
+        baseline.delete()
+
+        return redirect('baseline-manager')

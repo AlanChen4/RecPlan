@@ -5,9 +5,10 @@
     <h1>Home</h1>
     <div class="d-flex pt-4">
         <h3>Baseline site visits distribution</h3>
-        <button class="btn btn-black ms-auto" data-bs-toggle="collapse" data-bs-target="#collapse-baseline" aria-expanded="true">
+        <button class="btn btn-black ms-auto mx-1" data-bs-toggle="collapse" data-bs-target="#collapse-baseline" aria-expanded="true">
             Show/hide baseline model
         </button>
+        <a class="btn btn-green mx-1" href="{% url 'baseline-manager' %}">Manage baseline model(s)</a>
     </div>
     <div class="collapse show" id="collapse-baseline">
         <div class="row">
