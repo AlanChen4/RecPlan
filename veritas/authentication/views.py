@@ -34,7 +34,7 @@ class RegisterPage(FormView):
 
     def get(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            return redirect('portfolios')
+            return redirect('bundles')
         return super().get(*args, **kwargs)
 
 
