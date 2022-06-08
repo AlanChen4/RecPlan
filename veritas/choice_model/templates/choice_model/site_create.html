@@ -1,4 +1,87 @@
+{% extends 'choice_model/main.html' %}
 {% load plotly_dash %}
 {% block content%}
-{% plotly_app name="AddSite" ratio=0.7 initial_arguments=dash_context %}
+<div class="container">
+    <h1>Add a new site</h1>
+    <form action="." method="post"> {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <label for="siteName">Site Name</label>
+                <input class="form-control" type="text" name="site_name" id="siteName" required>
+            </div>
+            <div class="col-md-4">
+                <label for="acres">Acres</label>
+                <input class="form-control" type="number" name="acres" id="acres" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="trails">Trails</label>
+                <input class="form-control" type="number" name="trails" id="trails" required>
+            </div>
+            <div class="col-md-4">
+                <label for="trailMiles">Trail Miles</label>
+                <input class="form-control" type="number" name="trail_miles" id="trailMiles" required>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="picnic_area">
+                    <label class="form-check-label">Has Picnic Area</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="sports_facilities">
+                    <label class="form-check-label">Has Sports Facilities</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="swimming_facilities">
+                    <label class="form-check-label">Has Swimming Facilities</label>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="boat_launch">
+                    <label class="form-check-label">Has Picnic Area</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="waterbody">
+                    <label class="form-check-label">Has Waterbody(s)</label>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="bathrooms">
+                    <label class="form-check-label">Has Bathrooms</label>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" name="playgrounds">
+                    <label class="form-check-label">Has Playgrounds</label>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>GEOID</label>
+                <input class="form-control" type="text" name="geo_id" required>
+            </div>
+            <div class="col-md-8 d-flex">
+                <input type="submit" value="Add site" class="ms-auto btn btn-black">
+            </div>
+        </div>
+    </form>
+    {% plotly_app name='AddSite' ratio=0.7 initial_arguments=dash_context %}
+</div>
 {% endblock content%}

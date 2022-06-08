@@ -1,8 +1,9 @@
 import json
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.middleware.csrf import get_token
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
@@ -10,36 +11,38 @@ from choice_model.dashapps import add_site, site_choice_prob, site_selection
 from choice_model.dashapp_helpers import *
 from choice_model.models import *
 
-import dash_core_components as dcc
 from pathlib import Path
 
 
-class SiteCreate(LoginRequiredMixin, CreateView):
-    model = ModifiedSite
-    fields = ['name', 'acres', 'trails', 'trail_miles', 'picnic_area', 'sports_facilities', 'swimming_facilities', 'boat_launch', 'waterbody', 'bathrooms', 'playgrounds']
-    template_name = 'choice_model/site_create.html'
+@login_required
+def SiteCreate(request, **kwargs):
+    if request.method == 'GET':
+        # calculate sum of equity for each block
+        choice_model = ChoiceModel(user=request.user)
+        bg_utility_black = choice_model.get_utility_by_block_group()[0].sum().to_frame()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        bundle_id = str(self.kwargs['pk'])
-        add_site_plot = create_add_site_plot_fig()
-
-        context['bundle_id'] = bundle_id
-        context['dash_context'] = {
-            'add-site-plot': {'figure': add_site_plot},
-            'bundle_id': {'value': bundle_id},
-            'csrfmiddlewaretoken': {'value': get_token(self.request)}
+        # convert to format that can be read by choropleth mapbox
+        bg_utility_black['GEOID'] = bg_utility_black.index.str.replace(', ', '').str[:6]
+        bg_utility_black = bg_utility_black.rename(columns={0: 'black_utility'})
+        
+        bundle_id = str(kwargs['pk'])
+        context = {
+            'bundle_id': bundle_id,
+            'dash_context': {
+                'add-site-plot': {'figure': create_add_site_plot_fig(bg_utility_black)},
+                'bundle_id': {'value': bundle_id},
+                'csrfmiddlewaretoken': {'value': get_token(request)}
+            }
         }
 
-        return context
-
-def SiteCreateDash(request, **kwargs):
-    if request.method == 'POST':
+        return render(request, 'choice_model/site_create.html', context)
+    
+    elif request.method == 'POST':
         form_data = request.POST
+        bundle_id = str(kwargs['pk'])
 
         # get the appropriate lat & lon for the respective GEOID
-        geoid = form_data['geoid']
+        geoid = form_data['geo_id']
         wake_bg_path = Path() / 'choice_model/data/wake_bg.json'
         with open(wake_bg_path) as f:
             wake_bg = json.load(f)
@@ -50,22 +53,23 @@ def SiteCreateDash(request, **kwargs):
                 break
 
         ModifiedSite.objects.create(
-            bundle_id=ModifiedSitesBundle.objects.get(bundle_id=form_data['bundle_id']),
+            bundle=ModifiedSitesBundle.objects.get(id=bundle_id),
             latitude=lat,
             longitude=lon,
             name=form_data['site_name'],
             acres=float(form_data['acres']),
             trails=int(form_data['trails']),
             trail_miles=float(form_data['trail_miles']),
-            picnic_area=int(form_data['picnic_area']),
-            sports_facilities=int(form_data['sports_facilities']),
-            swimming_facilities=int(form_data['swimming_facilities']),
-            boat_launch=int(form_data['boat_launch']),
-            waterbody=int(form_data['waterbody']),
-            bathrooms=int(form_data['bathrooms']),
-            playgrounds=int(form_data['playgrounds']),
+            picnic_area=(1 if form_data.get('picnic_area') else 0),
+            sports_facilities=(1 if form_data.get('picnic_area') else 0),
+            swimming_facilities=(1 if form_data.get('swimming_facilities') else 0),
+            boat_launch=(1 if form_data.get('boat_launch') else 0),
+            waterbody=(1 if form_data.get('waterbody') else 0),
+            bathrooms=(1 if form_data.get('bathrooms') else 0),
+            playgrounds=(1 if form_data.get('playgrounds') else 0),
         )
-        return redirect(reverse('bundle-update', kwargs={'pk': form_data['bundle_id']}))
+
+        return redirect(reverse('bundle-update', kwargs={'pk': bundle_id}))
 
 
 class ModifiedSiteCreate(LoginRequiredMixin, CreateView):
