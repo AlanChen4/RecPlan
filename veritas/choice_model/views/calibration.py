@@ -2,14 +2,13 @@ from django.shortcuts import redirect, render
 
 from choice_model.models import BaselineModel, BaselineSite
 from choice_model.choicemodel import ChoiceModel
+from choice_model.constants import BASELINE_VISITS
 
 
 def RecalibrateBaseline(request):
     if request.method == 'GET':
-        choice_model = ChoiceModel(user=request.user)
-        baseline_site_visits = choice_model.get_site_visits()
+        return render(request, 'choice_model/calibration.html', {'baseline_site_visits': BASELINE_VISITS.to_dict()['visits']})
 
-        return render(request, 'choice_model/calibration.html', {'baseline_site_visits': baseline_site_visits})
     elif request.method == 'POST':
         # set other baseline calibration model 'selected' as False, so that current one is selected
         baseline_models = BaselineModel.objects.all()
