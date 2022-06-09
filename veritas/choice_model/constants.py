@@ -47,4 +47,4 @@ SITE_LOCATIONS = pd.read_parquet(CURRENT_PATH / 'site_locations.parquet')
 
 # BASELINE_VISITS
 # index is site name, column is visits
-BASELINE_VISITS = pd.read_parquet(CURRENT_PATH / 'baseline_visits.parquet')
+BASELINE_VISITS = pd.read_parquet(CURRENT_PATH / 'baseline_visits.parquet').set_index('site_name')
