@@ -125,9 +125,9 @@ class ChoiceModel():
                 true_visits.append(0)
             else:
                 if self.baseline_model is None:
-                    true_visits.append(BASELINE_VISITS.loc[site])
+                    true_visits.append(BASELINE_VISITS.loc[site].visits)
                 else:
-                    true_visits.append(new_baseline_sites[site])
+                    true_visits.append(new_baseline_sites[site].visits)
 
             # deals with error since there are duplicated of sites in initial data
             sa = site_attractiveness.loc[site].sum()
@@ -162,13 +162,16 @@ class ChoiceModel():
 
         return visitation_probability
 
-    def get_site_visits(self):
+    def get_site_visits(self, as_df=False):
         """
         return dictionary with site names as keys and their respective visits from population as values
         """
         # use visitation probabilities along with population numbers to find number of people
         visitation_probability = self.get_site_visitation_probability()
         visits = visitation_probability.multiply(POPULATION.sum(axis=1)).sum(axis=1)
+
+        if as_df:
+            return visits.to_frame()
 
         visits_dict = {}
         for name, prob in zip(visits.index.to_list(), visits.values.tolist()):
@@ -194,10 +197,7 @@ class ChoiceModel():
         return equity evaluations for black and non-black groups
         """
         exp_site_attractiveness = self._get_site_attractiveness()
-        exp_site_attractiveness[exp_site_attractiveness < 0] = 0
-
-        site_attractiveness = np.sqrt(exp_site_attractiveness)
-        site_attractiveness[site_attractiveness == 0] = -1000
+        exp_site_attractiveness[exp_site_attractiveness <= 0] = 1
         utility_index = np.log(exp_site_attractiveness)
 
         visitation_probability = self.get_site_visitation_probability()
@@ -229,3 +229,17 @@ class ChoiceModel():
         
         return equity_evaluation
 
+    def get_utility_by_block_group(self):
+        exp_site_attractiveness = self._get_site_attractiveness()
+        exp_site_attractiveness[exp_site_attractiveness <= 0] = 1
+        utility_index = np.log(exp_site_attractiveness)
+
+        visitation_probability = self.get_site_visitation_probability()
+
+        all_trips_black = POPULATION['Black'] * visitation_probability
+        all_trips_other = POPULATION['Other'] * visitation_probability
+
+        utility_weighted_trips_black = all_trips_black * utility_index
+        utility_weighted_trips_other = all_trips_other * utility_index
+
+        return utility_weighted_trips_black, utility_weighted_trips_other       
