@@ -27,6 +27,9 @@ class ModifiedSitesBundle(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     nickname = models.CharField(max_length=100)
 
+    def __str__(self):
+        return f'{self.nickname} ({self.user.email})'
+
 
 CHOICES = (
     (0, 'No'),
@@ -56,9 +59,15 @@ class BaselineModel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     selected = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f'{self.name} ({self.user.email})'
+
 
 class BaselineSite(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     baseline_model = models.ForeignKey(BaselineModel, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     visits = models.FloatField()
+
+    def __str__(self):
+        return f'{self.name} ({self.baseline_model.name})'
