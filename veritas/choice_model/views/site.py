@@ -7,6 +7,7 @@ from django.shortcuts import redirect, render
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
+from choice_model.choicemodel import ChoiceModel
 from choice_model.dashapps import add_site, site_choice_prob, site_selection
 from choice_model.dashapp_helpers import *
 from choice_model.models import *
@@ -113,8 +114,7 @@ class ModifiedSiteCreate(LoginRequiredMixin, CreateView):
         bundle_id = str(self.kwargs['pk'])
         site = Site.objects.get(name=self.kwargs['site_name'])
 
-        form.instance.history_id = self.request.user
-        form.instance.bundle_id = ModifiedSitesBundle.objects.get(bundle_id=bundle_id)
+        form.instance.bundle = ModifiedSitesBundle.objects.get(id=bundle_id)
         form.instance.latitude = site.latitude
         form.instance.longitude = site.longitude
 
@@ -130,7 +130,7 @@ class ModifiedSiteUpdate(LoginRequiredMixin, UpdateView):
         bundle_id = str(self.kwargs['pk'])
         site_name = str(self.kwargs['site_name'])
 
-        return ModifiedSite.objects.get(bundle_id=bundle_id, name=site_name)
+        return ModifiedSite.objects.get(id=bundle_id, name=site_name)
 
     def get_success_url(self):
         bundle_id = str(self.kwargs['pk'])
@@ -143,4 +143,4 @@ class ModifiedSiteDelete(LoginRequiredMixin, DeleteView):
     template_name = 'choice_model/modified_site_delete.html'
 
     def get_success_url(self):
-        return reverse_lazy('bundle-update', kwargs={'pk': self.object.bundle_id.bundle_id})
+        return reverse_lazy('bundle-update', kwargs={'pk': self.object.bundle.id})
