@@ -2,76 +2,76 @@
 {% load plotly_dash %}
 {% block content %}
 <div class="container">
-    <h1>Home</h1>
-    <div class="d-flex pt-4">
-        <h3>Baseline site visits distribution</h3>
-        <button class="btn btn-black ms-auto mx-1" data-bs-toggle="collapse" data-bs-target="#collapse-baseline" aria-expanded="true">
-            Show/hide baseline model
-        </button>
-        <a class="btn btn-green mx-1" href="{% url 'baseline-manager' %}">Manage baseline model(s)</a>
-    </div>
-    <div class="collapse show" id="collapse-baseline">
-        <div class="row">
-            {% plotly_app name="SiteChoiceProb" ratio=0.35 initial_arguments=dash_context %}
+
+    <!-- saved models card -->
+    <div class="bg-white rounded card px-4 mb-3 shadow-sm">
+        <div class="d-flex flex-row mt-3">
+            <h2>Saved Scenarios</h2>
+            <a class="btn btn-black my-2 ms-auto" href="{% url 'bundle-create' %}">Create New Scenario</a>
         </div>
-        <div class="d-flex flex-row mt-2">
-                <p>Not happy with our baseline? Feel free to recalibrate with your own inputs</p>
-                <a class="ms-auto" href="{% url 'recalibrate-baseline' %}">Recalibrate Baseline</a>
-        </div>
-    </div>
-    <div class="d-flex flex-row mt-3">
-        <h3>Saved models</h3>
-        <a class="btn btn-black my-2 ms-auto" href="{% url 'bundle-create' %}">Create new model</a>
-    </div>
-    <div class="py-2">
-        <div class="d-flex flex-row flex-nowrap overflow-auto pb-5">
-            {% if bundles|length > 0 %}
-                {% for bundle in bundles %}
-                    <div class="card card-body text-center justify-content-center">
-                        {{ bundle.nickname }}
-                        <div class="d-flex justify-content-center">
-                            <a class="btn btn-white border-0" href="{% url 'bundle' bundle.id %}">
-                                Calculate
-                                <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <rect x="4" y="3" width="16" height="18" rx="2"></rect>
-                                    <rect x="8" y="7" width="8" height="3" rx="1"></rect>
-                                    <line x1="8" y1="14" x2="8" y2="14.01"></line>
-                                    <line x1="12" y1="14" x2="12" y2="14.01"></line>
-                                    <line x1="16" y1="14" x2="16" y2="14.01"></line>
-                                    <line x1="8" y1="17" x2="8" y2="17.01"></line>
-                                    <line x1="12" y1="17" x2="12" y2="17.01"></line>
-                                    <line x1="16" y1="17" x2="16" y2="17.01"></line>
-                                </svg>
-                            </a>
-                            <a class="btn btn-white border-0" href="{% url 'bundle-update' bundle.id %}">
-                                Edit
-                                <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
-                                    <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
-                                    <path d="M16 5l3 3"></path>
-                                </svg>
-                            </a>
-                            <a class="btn btn-white border-0" href="{% url 'bundle-delete' bundle.id %}">
-                                Delete
-                                <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                                    <line x1="4" y1="7" x2="20" y2="7"></line>
-                                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                                    <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
-                                    <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
-                                </svg>
-                            </a>
+        <div class="py-2">
+            <div class="d-flex flex-row flex-nowrap overflow-auto pb-2">
+                {% if bundles|length > 0 %}
+                    {% for bundle in bundles %}
+                        <div class="card card-body text-center justify-content-center">
+                            {{ bundle.nickname }}
+                            <div class="d-flex justify-content-center">
+                                <a class="btn btn-white border-0" href="{% url 'bundles' bundle.id %}">
+                                    Calculate
+                                    <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <rect x="4" y="3" width="16" height="18" rx="2"></rect>
+                                        <rect x="8" y="7" width="8" height="3" rx="1"></rect>
+                                        <line x1="8" y1="14" x2="8" y2="14.01"></line>
+                                        <line x1="12" y1="14" x2="12" y2="14.01"></line>
+                                        <line x1="16" y1="14" x2="16" y2="14.01"></line>
+                                        <line x1="8" y1="17" x2="8" y2="17.01"></line>
+                                        <line x1="12" y1="17" x2="12" y2="17.01"></line>
+                                        <line x1="16" y1="17" x2="16" y2="17.01"></line>
+                                    </svg>
+                                </a>
+                                <a class="btn btn-white border-0" href="{% url 'bundle-update' bundle.id %}">
+                                    Edit
+                                    <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
+                                        <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z"></path>
+                                        <path d="M16 5l3 3"></path>
+                                    </svg>
+                                </a>
+                                <a class="btn btn-white border-0" href="{% url 'bundle-delete' bundle.id %}">
+                                    Delete
+                                    <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <line x1="4" y1="7" x2="20" y2="7"></line>
+                                        <line x1="10" y1="11" x2="10" y2="17"></line>
+                                        <line x1="14" y1="11" x2="14" y2="17"></line>
+                                        <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"></path>
+                                        <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"></path>
+                                    </svg>
+                                </a>
+                            </div>
                         </div>
+                    {% endfor %}
+                {% else %}
+                    <div>
+                        <h3 class="text-center"><strong>No Models. Create Your First One!</strong></h3>
                     </div>
-                {% endfor %}
-            {% else %}
-                <div>
-                    <h3 class="text-center"><strong>No Models. Create Your First One!</strong></h3>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- baseline model card -->
+    <div class="bg-white rounded card p-3 shadow-sm">
+        <div class="d-flex flex-row mb-3">
+            <h2>Viewing <strong>{% if bundle == None %}Baseline{% else %}{{ bundle.nickname }}{% endif %}</strong></h2>
+            <button class="btn btn-black ms-auto mx-1" data-bs-toggle="collapse" data-bs-target="#collapse-baseline" aria-expanded="true">
+                Show/Hide
+            </button>
+        </div>
+        <div class="collapse show" id="collapse-baseline">
+            {% plotly_app name="SiteChoiceProb" ratio=0.40 initial_arguments=dash_context %}
         </div>
     </div>
 </div>

@@ -162,22 +162,15 @@ class ChoiceModel():
 
         return visitation_probability
 
-    def get_site_visits(self, as_df=False):
+    def get_site_visits(self):
         """
         return dictionary with site names as keys and their respective visits from population as values
         """
         # use visitation probabilities along with population numbers to find number of people
         visitation_probability = self.get_site_visitation_probability()
-        visits = visitation_probability.multiply(POPULATION.sum(axis=1)).sum(axis=1)
+        visits = visitation_probability.multiply(POPULATION.sum(axis=1)).sum(axis=1).to_frame().rename(columns={0: 'visits'})
 
-        if as_df:
-            return visits.to_frame()
-
-        visits_dict = {}
-        for name, prob in zip(visits.index.to_list(), visits.values.tolist()):
-            visits_dict[name] = prob
-
-        return visits_dict
+        return visits
 
     def get_site_locations(self):
         """

@@ -1,5 +1,7 @@
+from django.shortcuts import render
 import plotly.express as px
 
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -13,65 +15,39 @@ from choice_model.dashapp_helpers import *
 from choice_model.models import *
 
 
-class BundleList(LoginRequiredMixin, ListView):
-    model = ModifiedSitesBundle
-    context_object_name = 'bundles'
-    template_name = 'choice_model/bundles.html'
+@login_required
+def BundleList(request, bundle_id=None):
+    if request.method == 'GET':
+        bundles = ModifiedSitesBundle.objects.filter(user=request.user)
+        bundle = None if bundle_id is None else bundles.get(id=bundle_id)
+            
+        baseline = ChoiceModel(request.user, bundle=None)
+        counterfactual = ChoiceModel(request.user, bundle=bundle)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+        baseline_visits = baseline.get_site_visits()
+        counterfactual_visits = counterfactual.get_site_visits()
+        baseline_visits['type'] = 'baseline'
+        counterfactual_visits['type'] = 'counterfactual'
+        combined_visits = pd.concat([baseline_visits, counterfactual_visits])
 
-        choice_model = ChoiceModel(self.request.user)
-        baseline_site_visits = choice_model.get_site_visits()
-        baseline_visitation_prob = choice_model.get_site_visitation_probability()
-        equity_evaluation = choice_model.get_equity_evaluation()
+        equity_evaluation = counterfactual.get_equity_evaluation()
         equity_black, equity_other = equity_evaluation['average_utility_black'], equity_evaluation['average_utility_other']
 
-        bubble_fig = create_bubble_plot_fig(baseline_site_visits)
-        map_scatter_fig = create_map_scatter_plot_fig(baseline_visitation_prob, choice_model.get_site_locations())
+        bubble_fig = create_bubble_plot_fig(combined_visits)
+        map_scatter_fig = create_map_scatter_plot_fig(counterfactual_visits, counterfactual.get_site_locations())
         equity_evaluation_fig = create_equity_evaluation_fig(equity_black, equity_other)
 
-        context['dash_context'] = {
-            'bubble-plot': {'figure': bubble_fig},
-            'map-scatter-plot': {'figure': map_scatter_fig},
-            'equity-evaluation-plot': {'figure': equity_evaluation_fig},
+        context = {
+            'bundles': bundles,
+            'bundle': bundle,
+            'dash_context': {
+                'bubble-plot': {'figure': bubble_fig},
+                'map-scatter-plot': {'figure': map_scatter_fig},
+                'equity-evaluation-plot': {'figure': equity_evaluation_fig},
+            },
         }
 
-        return context
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
-
-
-class BundleDetail(LoginRequiredMixin, DetailView):
-    model = ModifiedSitesBundle
-    context_object_name = 'bundle'
-    template_name = 'choice_model/bundle.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        choice_model = ChoiceModel(user=self.request.user, bundle=self.object)
-        site_visits = choice_model.get_site_visits()
-        visitation_prob = choice_model.get_site_visitation_probability()
-        equity_evaluation = choice_model.get_equity_evaluation()
-        equity_evaluation = choice_model.get_equity_evaluation()
-        equity_black, equity_other = equity_evaluation['average_utility_black'], equity_evaluation['average_utility_other']
-
-        bubble_fig = create_bubble_plot_fig(site_visits)
-        map_scatter_fig = create_map_scatter_plot_fig(visitation_prob, choice_model.get_site_locations())
-        equity_evaluation_fig = create_equity_evaluation_fig(equity_black, equity_other)
-
-        context['dash_context'] = {
-            'bubble-plot': {'figure': bubble_fig},
-            'map-scatter-plot': {'figure': map_scatter_fig},
-            'equity-evaluation-plot': {'figure': equity_evaluation_fig},
-        }
-
-        return context
-
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+        return render(request, 'choice_model/bundles.html', context)
 
 
 class BundleCreate(LoginRequiredMixin, CreateView):
