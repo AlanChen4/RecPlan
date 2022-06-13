@@ -2,6 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    path('', BundleList, name='bundles'),
     path('models/', BundleList, name='bundles'),
     path('models/<uuid:bundle_id>/', BundleList, name='bundles'),
     path('model/', BundleCreate.as_view(), name='bundle-create'),
