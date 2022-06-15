@@ -21,10 +21,10 @@ class ChoiceModel():
 
     def _get_baseline_model(self, user):
         """
-        check if there are any recalibrated baseline models belonging to the user. if there are, return the one that is being used (using the selected attribute)
+        check if there are any recalibrated baseline models belonging to the user
         """
-        if BaselineModel.objects.filter(user=user, selected=True).exists():
-            return BaselineModel.objects.get(user=user, selected=True)
+        if BaselineModel.objects.filter(user=user).exists():
+            return BaselineModel.objects.get(user=user)
         return None
 
     def _get_baseline_sites(self):

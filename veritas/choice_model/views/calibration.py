@@ -10,17 +10,10 @@ def RecalibrateBaseline(request):
         return render(request, 'choice_model/calibration.html', {'baseline_site_visits': BASELINE_VISITS.to_dict()['visits']})
 
     elif request.method == 'POST':
-        # set other baseline calibration model 'selected' as False, so that current one is selected
-        baseline_models = BaselineModel.objects.all()
-        for model in baseline_models:
-            model.selected = False
-            model.save()
-
         # create baseline calibration model
         baseline_model = BaselineModel.objects.create(
             user=request.user,
             name=request.POST['baselineModelName'],
-            selected=True,
         )
 
         # add site data to the baseline model
@@ -35,26 +28,6 @@ def RecalibrateBaseline(request):
                 )
 
         return redirect('bundles')
-
-
-def BaselineManager(request):
-    if request.method == 'GET':
-        baselines = BaselineModel.objects.filter(user=request.user)
-
-        return render(request, 'choice_model/baselines.html', {'baselines': baselines})
-
-
-def SelectBaseline(request):
-    if request.method == 'POST':
-        baselines = BaselineModel.objects.filter(user=request.user)
-        for baseline in baselines:
-            if str(baseline.id) == request.POST['baseline_id']:
-                baseline.selected = True
-            else:
-                baseline.selected = False
-            baseline.save()
-
-        return redirect('baseline-manager')
 
     
 def EditBaseline(request, **kwargs):
@@ -79,12 +52,13 @@ def EditBaseline(request, **kwargs):
                 baseline_site.visits = site_visits
                 baseline_site.save()
 
-        return redirect('baseline-manager')
+        return redirect('bundles')
 
 
 def DeleteBaseline(request, **kwargs):
-    if request.method == 'POST':
+    # even though delete should not be done with GET, I'm doing so here to simplify logic on the frontend
+    if request.method == 'GET':
         baseline = BaselineModel.objects.get(user=request.user, id=kwargs['baseline_id'])
         baseline.delete()
 
-        return redirect('baseline-manager')
+        return redirect('bundles')

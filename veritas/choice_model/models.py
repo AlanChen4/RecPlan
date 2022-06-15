@@ -57,7 +57,6 @@ class BaselineModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     name = models.CharField(max_length=255)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    selected = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.name} ({self.user.email})'

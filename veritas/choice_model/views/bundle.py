@@ -3,8 +3,6 @@ import plotly.express as px
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from itertools import chain
@@ -18,6 +16,12 @@ from choice_model.models import *
 @login_required
 def BundleList(request, bundle_id=None):
     if request.method == 'GET':
+        # check for existing user-modified baseline
+        custom_baseline = None
+        if BaselineModel.objects.filter(user=request.user).exists():
+            custom_baseline = BaselineModel.objects.get(user=request.user)
+
+        # make choice model calculations
         bundles = ModifiedSitesBundle.objects.filter(user=request.user)
         bundle = None if bundle_id is None else bundles.get(id=bundle_id)
             
@@ -40,6 +44,7 @@ def BundleList(request, bundle_id=None):
         context = {
             'bundles': bundles,
             'bundle': bundle,
+            'custom_baseline': custom_baseline,
             'dash_context': {
                 'bubble-plot': {'figure': bubble_fig},
                 'map-scatter-plot': {'figure': map_scatter_fig},

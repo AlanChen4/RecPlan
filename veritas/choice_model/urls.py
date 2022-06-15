@@ -15,8 +15,6 @@ urlpatterns = [
     path('modified-site/<uuid:pk>/<str:site_name>/update/', ModifiedSiteUpdate.as_view(), name='modified-site-update'),
 
     path('recalibrate/', RecalibrateBaseline, name='recalibrate-baseline'),
-    path('baselines/', BaselineManager, name='baseline-manager'),
-    path('baseline/select/', SelectBaseline, name='select-baseline'),
     path('baseline/edit/<uuid:baseline_id>/', EditBaseline, name='edit-baseline'),
     path('baseline/delete/<uuid:baseline_id>/', DeleteBaseline, name='delete-baseline'),
 ]

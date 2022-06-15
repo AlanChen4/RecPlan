@@ -1,7 +1,6 @@
 {% extends 'choice_model/main.html' %}
 {% block content %}
 <div class="container">
-    <a href="{% url 'baseline-manager' %}">Go back to baseline manager</a>
     <h1 class="mb-3">Edit <strong>{{ baseline.name }}</strong></h1>
     <form action="." method="POST" class="mt-3"> {% csrf_token %}
         <div class="row mb-3">
