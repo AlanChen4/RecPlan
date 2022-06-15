@@ -127,7 +127,7 @@ class ChoiceModel():
                 if self.baseline_model is None:
                     true_visits.append(BASELINE_VISITS.loc[site].visits)
                 else:
-                    true_visits.append(new_baseline_sites[site].visits)
+                    true_visits.append(new_baseline_sites[site])
 
             # deals with error since there are duplicated of sites in initial data
             sa = site_attractiveness.loc[site].sum()
