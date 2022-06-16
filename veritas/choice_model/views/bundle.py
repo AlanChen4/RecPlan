@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 import plotly.express as px
 
 from django.contrib.auth.decorators import login_required
@@ -66,40 +66,33 @@ class BundleCreate(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class BundleUpdate(LoginRequiredMixin, UpdateView):
-    model = ModifiedSitesBundle
-    fields = ['nickname']
-    success_url = reverse_lazy('bundles')
-    context_object_name = 'bundle'
-    template_name = 'choice_model/bundle_modify.html'
+@login_required
+def BundleUpdate(request, **kwargs):
+    if request.method == 'GET':
+        context = {
+            'bundle': ModifiedSitesBundle.objects.get(user=request.user, id=kwargs['pk']),
+            'modified': False,
+        }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        bundle_id = self.object.id
-        context['bundle_id'] = bundle_id
-
-        # check filter for modified-only
-        if self.request.GET.get('modified-only') == 'on':
+        # check for filter for only modified/new sites
+        if request.GET.get('modified-only') is not None:
             context['modified'] = True
-            context['sites'] = ModifiedSite.objects.all().filter(bundle=bundle_id).order_by('name')
+            context['sites'] = ModifiedSite.objects.filter(bundle=kwargs['pk']).order_by('name')
         else:
-            context['modified'] = False
-
-            # prevent original site from showing up if already in modified sites
-            modified_sites = ModifiedSite.objects.all().filter(bundle=bundle_id)
+            # prevent original sites from showing up if already in modified sites
+            modified_sites = ModifiedSite.objects.all().filter(bundle=kwargs['pk'])
             modified_sites_names = [site.name for site in modified_sites]
             original_sites = Site.objects.all().exclude(name__in=modified_sites_names)
             context['sites'] = sorted(list(chain(original_sites, modified_sites)), key=lambda site: site.name)
 
         # check if site is being selected to show on map/characteristics
-        if self.request.GET.get('show-site') is not None:
-            # get site characteristics based on name
-            selected_site_name = self.request.GET.get('show-site')
+        if request.GET.get('show-site') is not None:
+            selected_site_name = request.GET.get('show-site')
             
-            if ModifiedSite.objects.all().filter(bundle=bundle_id, name=selected_site_name).exists():
-                selected_site = ModifiedSite.objects.all().get(bundle=bundle_id, name=selected_site_name)
+            if ModifiedSite.objects.filter(bundle=kwargs['pk'], name=selected_site_name).exists():
+                selected_site = ModifiedSite.objects.all().get(bundle=kwargs['pk'], name=selected_site_name)
             else:
-                selected_site = Site.objects.all().get(name=selected_site_name)
+                selected_site = Site.objects.get(name=selected_site_name)
 
             # pass selected site into context
             context['selected_site'] = selected_site
@@ -117,13 +110,17 @@ class BundleUpdate(LoginRequiredMixin, UpdateView):
             context['selected_site'] = None
 
         # include name of sites that have already been modified
-        context['modified_site_names'] = ModifiedSite.objects.filter(bundle=self.object).values_list('name', flat=True)
+        context['modified_site_names'] = ModifiedSite.objects.filter(bundle=kwargs['pk']).values_list('name', flat=True)
         context['dash_context'] = {'map-plot': {'figure': map_scatter_fig}}
 
-        return context
+        return render(request, 'choice_model/bundle_modify.html', context)
 
-    def get_queryset(self):
-        return super().get_queryset().filter(user=self.request.user)
+    elif request.method == 'POST':
+        bundle = ModifiedSitesBundle.objects.get(id=kwargs['pk'], user=request.user)
+        bundle.nickname = request.POST['siteName']
+        bundle.save()
+
+        return redirect('bundle-update', pk=bundle.id)
 
 
 class BundleDelete(LoginRequiredMixin, DeleteView):

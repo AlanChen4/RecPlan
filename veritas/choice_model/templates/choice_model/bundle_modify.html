@@ -4,20 +4,26 @@
 
 <div class="container">
     <h1 class="py-2">Modify <strong>{{ bundle.nickname }}</strong></h1>
+    <form class="row" action="{% url 'bundle-update' bundle.id%}" method="post"> {% csrf_token %}
+        <div class="col-md-3">
+            <input class="form-control" type="text" placeholder="{{ bundle.nickname }}" name="siteName">
+        </div>
+        <div class="col-md-3">
+            <input class="btn btn-black" type="submit" value="Edit Name">
+        </div>
+    </form>
     <div class="row">
         <div class="col md-6">
             <form method="GET" action="{% url 'bundle-update' bundle.id %}">
                 <div class="form-check py-2">
                     <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if modified %} checked {% endif %}>
-                    <label class="form-check-label" for="modified-only">
-                        Only Show Modified/New Sites
-                    </label>  
+                    <label class="form-check-label" for="modified-only">Only Show Modified/New Sites</label>  
                     <input class="btn btn-primary" type="submit" value="Filter">
                 </div>
             </form>
         </div>
         <div class="col md-6">
-            <a class="btn btn-black" href="{% url 'site-create' bundle_id %}">Add New Site</a>
+            <a class="btn btn-black" href="{% url 'site-create' bundle.id %}">Add New Site</a>
         </div>
     </div>
     <div class="row">
@@ -42,13 +48,13 @@
                         </td>
                         <td>
                             {% if site.name in modified_site_names %}
-                                <a href="{% url 'modified-site-update' bundle_id site.name %}">Modify</a>
+                                <a href="{% url 'modified-site-update' bundle.id site.name %}">Modify</a>
                             {% else  %}
-                                <a href="{% url 'modified-site-create' bundle_id site.name %}">Modify</a>
+                                <a href="{% url 'modified-site-create' bundle.id site.name %}">Modify</a>
                             {% endif %}
                         </td>
                         <td>
-                            <a href="{% url 'bundle-update' bundle_id  %}?show-site={{site.name}}">Show</a>
+                            <a href="{% url 'bundle-update' bundle.id  %}?show-site={{site.name}}">Show</a>
                         </td>
                     </tr>
                 </tbody>

@@ -6,7 +6,7 @@ urlpatterns = [
     path('models/', BundleList, name='bundles'),
     path('models/<uuid:bundle_id>/', BundleList, name='bundles'),
     path('model/', BundleCreate.as_view(), name='bundle-create'),
-    path('model/<uuid:pk>/update/', BundleUpdate.as_view(), name='bundle-update'),
+    path('model/<uuid:pk>/update/', BundleUpdate, name='bundle-update'),
     path('model/<uuid:pk>/delete/', BundleDelete.as_view(), name='bundle-delete'),
 
     path('site/<uuid:pk>/', SiteCreate, name='site-create'),
