@@ -8,6 +8,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse, reverse_lazy
 
 from choice_model.choicemodel import ChoiceModel
+from choice_model.constants import *
 from choice_model.dashapps import add_site, site_choice_prob, site_selection
 from choice_model.dashapp_helpers import *
 from choice_model.models import *
@@ -44,10 +45,7 @@ def SiteCreate(request, **kwargs):
 
         # get the appropriate lat & lon for the respective GEOID
         geoid = form_data['geo_id']
-        wake_bg_path = Path() / 'choice_model/data/wake_bg.json'
-        with open(wake_bg_path) as f:
-            wake_bg = json.load(f)
-        for feature in wake_bg['features']:
+        for feature in WAKE_BG_GEOJSON['features']:
             if geoid == feature['properties']['GEOID']:
                 lat = float(feature['properties']['INTPTLAT'])
                 lon = float(feature['properties']['INTPTLON'])
