@@ -31,7 +31,7 @@ def SiteCreate(request, **kwargs):
         context = {
             'bundle_id': bundle_id,
             'dash_context': {
-                'add-site-plot': {'figure': create_add_site_plot_fig(bg_utility_black)},
+                'add-site-plot': {'figure': create_spatial_equity_fig(bg_utility_black)},
                 'bundle_id': {'value': bundle_id},
                 'csrfmiddlewaretoken': {'value': get_token(request)}
             }

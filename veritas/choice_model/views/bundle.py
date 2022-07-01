@@ -16,30 +16,43 @@ from choice_model.models import *
 @login_required
 def BundleList(request, bundle_id=None):
     if request.method == 'GET':
-        # check for existing user-modified baseline
-        custom_baseline = None
-        if BaselineModel.objects.filter(user=request.user).exists():
-            custom_baseline = BaselineModel.objects.get(user=request.user)
 
-        # make choice model calculations
+        # load all bundles belonging to user
         bundles = ModifiedSitesBundle.objects.filter(user=request.user)
+
+        # define bundle in focus
         bundle = None if bundle_id is None else bundles.get(id=bundle_id)
             
+        # calculate the baseline & counterfactual (if bundle == None then counterfactual will be baseline)
         baseline = ChoiceModel(request.user, bundle=None)
         counterfactual = ChoiceModel(request.user, bundle=bundle)
 
+        # calculate site visits for both baseline and counterfactual, then combine into one dataframe
         baseline_visits = baseline.get_site_visits()
         counterfactual_visits = counterfactual.get_site_visits()
         baseline_visits['type'] = 'baseline'
         counterfactual_visits['type'] = 'counterfactual'
         combined_visits = pd.concat([baseline_visits, counterfactual_visits])
 
+        # calculate equity evaluation for counterfactual
         equity_evaluation = counterfactual.get_equity_evaluation()
         equity_black, equity_other = equity_evaluation['average_utility_black'], equity_evaluation['average_utility_other']
 
+        # get equity of each block group for baseline & counterfactual and then store the difference
+        counterfactual_bg_utility_black = counterfactual.get_utility_by_block_group()[0].sum().to_frame()
+        baseline_bg_utility_black = baseline.get_utility_by_block_group()[0].sum().to_frame()
+        diff_bg_utility_black = counterfactual_bg_utility_black - baseline_bg_utility_black
+        diff_bg_utility_black['GEOID'] = diff_bg_utility_black.index.str.replace(', ', '').str[:6]
+        diff_bg_utility_black = diff_bg_utility_black.rename(columns={0: 'black_utility'})
+
+        # create the plotly figures
         bubble_fig = create_bubble_plot_fig(combined_visits)
         map_scatter_fig = create_map_scatter_plot_fig(counterfactual_visits, counterfactual.get_site_locations())
         equity_evaluation_fig = create_equity_evaluation_fig(equity_black, equity_other)
+        spatial_equity_fig = create_spatial_equity_fig(diff_bg_utility_black)
+
+        # custom_baseline is None if no BaselineModel objects can be found, otherwise set as what is found
+        custom_baseline = None if not BaselineModel.objects.filter(user=request.user).exists() else BaselineModel.objects.get(user=request.user)
 
         context = {
             'bundles': bundles,
@@ -49,6 +62,7 @@ def BundleList(request, bundle_id=None):
                 'bubble-plot': {'figure': bubble_fig},
                 'map-scatter-plot': {'figure': map_scatter_fig},
                 'equity-evaluation-plot': {'figure': equity_evaluation_fig},
+                'spatial-equity-plot': {'figure': spatial_equity_fig},
             },
         }
 

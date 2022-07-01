@@ -18,12 +18,14 @@ app.layout = html.Div(children=[
             {'label': 'Bubble Plot', 'value': 'bubble-plot'},
             {'label': 'Map Scatter Plot', 'value': 'map-scatter-plot'},
             {'label': 'Equity Evaluation Graph', 'value': 'equity-evaluation-plot'},
+            {'label': 'Spatial Equity Plot', 'value': 'spatial-equity-plot'},
         ],
         value='bubble-plot',
     ),
     dcc.Graph(id='bubble-plot', figure=None, style=graph_style),
     dcc.Graph(id='map-scatter-plot', figure=None, style=graph_style),
     dcc.Graph(id='equity-evaluation-plot', figure=None, style=graph_style),
+    dcc.Graph(id='spatial-equity-plot', figure=None, style=graph_style),
 ])
 
 @app.callback(
@@ -52,5 +54,15 @@ def display_graphs(selected_value):
 )
 def display_graphs(selected_value):
     if 'equity-evaluation-plot' == selected_value:
+        return {'display': 'block'}
+    return {'display': 'none'}
+
+
+@app.callback(
+    Output('spatial-equity-plot', 'style'),
+    Input('radio', 'value')
+)
+def display_graphs(selected_value):
+    if 'spatial-equity-plot' == selected_value:
         return {'display': 'block'}
     return {'display': 'none'}
