@@ -72,6 +72,10 @@ class ChoiceModel():
             if modified_site_name not in SITE_DATA.index:
                 new_distances = []
                 for block_group in DISTANCES.columns:
+
+                    # TODO: remove this? examine this 
+                    # this can only be removed once models save block group in addition to lat/lon
+
                     block_group_lat, block_group_lon = float(block_group.split(', ')[-2]), float(block_group.split(', ')[-1])
                     modified_site_lat, modified_site_lon = modified_site.latitude, modified_site.longitude
                     
