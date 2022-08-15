@@ -89,7 +89,7 @@ MIDDLEWARE = [
 ]
 
 LOGIN_REDIRECT_URL = '/'
-LOGIN_URL = reverse_lazy('login')
+LOGIN_URL = reverse_lazy('landing')
 
 ROOT_URLCONF = 'veritas.urls'
 
