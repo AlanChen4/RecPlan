@@ -1,1 +1,1 @@
-# choice-model-dashboard
+# RecPlan
