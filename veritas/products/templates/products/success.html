@@ -1,0 +1,10 @@
+{% extends 'choice_model/main.html' %}
+{% block content %}
+<div class="container pt-5">
+    <h1 class="text-center mb-3">Subscription successful!</h1>
+    <form action="{% url 'create-portal-session' %}" method="POST" class="d-flex justify-content-center"> {% csrf_token %}
+      <input type="hidden" id="session-id" name="session_id" value="{{ session_id }}" />
+      <button class="btn btn-dark" type="submit">Manage your billing information</button>
+    </form>
+</div>
+{% endblock %}

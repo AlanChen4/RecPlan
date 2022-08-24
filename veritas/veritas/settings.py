@@ -11,8 +11,11 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import dj_database_url
 import os
+from dotenv import load_dotenv
 from django.urls import reverse_lazy
 from pathlib import Path
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,7 +61,8 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
 
     'authentication',
-    'choice_model'
+    'choice_model',
+    'products',
 ]
 
 AUTH_USER_MODEL = 'authentication.CustomUser'
@@ -88,7 +92,7 @@ MIDDLEWARE = [
       'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = reverse_lazy('bundles')
 LOGIN_URL = reverse_lazy('landing')
 
 ROOT_URLCONF = 'veritas.urls'
@@ -191,6 +195,13 @@ PLOTLY_COMPONENTS = [
     # Other components, as needed
     'dash_bootstrap_components',
 ]
+
+
+# Stripe related
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY')
+STRIPE_WEBHOOK_KEY = os.environ.get('STRIPE_WEBHOOK_KEY')
+
 
 if os.environ.get('DJANGO_DEVELOPMENT'):
     from .local_settings import *

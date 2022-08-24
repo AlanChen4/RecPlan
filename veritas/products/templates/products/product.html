@@ -1,0 +1,24 @@
+{% extends 'choice_model/main.html' %}
+{% block content %}
+<div class="container pt-5">
+    <h1 class="mb-3">Subscription</h1>
+    {% if subscription.status == "active" %}
+        <h4>Your Subscription</h4>
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text">
+                {{ product.description }}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <p>You are not currently subscribed. Please subscribe below to access all of RecPlan.</p>
+        <form action="{% url 'create-checkout-session' %}" method="POST"> {% csrf_token %}
+            <!-- Add a hidden field with the lookup_key of your Price -->
+            <input type="hidden" name="lookup_key" value="{{ PRICE_LOOKUP_KEY }}" />
+            <button class="btn btn-dark" id="checkout-and-portal-button" type="submit">Checkout</button>
+        </form>
+    {% endif %}
+</div>
+{% endblock %}
