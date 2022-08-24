@@ -1,6 +1,8 @@
 asgiref==3.5.0
 beautifulsoup4==4.11.1
 Brotli==1.0.9
+certifi==2022.6.15
+charset-normalizer==2.1.0
 click==8.0.4
 colorama==0.4.4
 crispy-bootstrap5==0.6
@@ -21,6 +23,7 @@ Flask==2.0.3
 Flask-Compress==1.11
 future==0.18.2
 h3==3.7.3
+idna==3.3
 itsdangerous==2.1.0
 Jinja2==3.0.3
 joblib==1.1.0
@@ -31,15 +34,19 @@ plotly==5.6.0
 psycopg2==2.9.3
 pyarrow==7.0.0
 python-dateutil==2.8.2
+python-dotenv==0.20.0
 pytz==2021.3
+requests==2.28.1
 scikit-learn==1.1.1
 scipy==1.8.1
 Shapely==1.8.1.post1
 six==1.16.0
 soupsieve==2.3.2.post1
 sqlparse==0.4.2
+stripe==4.0.2
 tenacity==8.0.1
 threadpoolctl==3.1.0
 tzdata==2021.5
+urllib3==1.26.11
 Werkzeug==2.0.3
 whitenoise==6.0.0
