@@ -34,11 +34,11 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     '127.0.0.1',
     'localhost',
-    'veritas-choice-model-django.herokuapp.com',
+    'recplan.herokuapp.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.veritas-choice-model-django.herokuapp.com',
+    'https://*.recplan.herokuapp.com/',
     'https://*.127.0.0.1',
 ]
 

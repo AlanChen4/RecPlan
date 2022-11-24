@@ -10,88 +10,43 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
 
-    <title>Veritas</title>
+    <title>RecPlan</title>
 </head>
 <style>
     body {
-        font-family: 'Poppins', sans-serif;
-    }
-
-    .bg-off-white {
-        background-color: #F5F5F5;
-    }
-
-    .btn-white {
-        border: 2px solid white;
-        color: white;
-    }
-
-    .btn-white:hover {
-        border: 2px solid #19e3b0;
-        color: #19e3b0;
-    }
-
-    .btn-black {
-        background-color: #002233;
-        border: 2px solid #002233;
-        color: white;
-    }
-
-    .btn-black:hover {
-        background-color: white;
-        border: 2px solid #19e3b0;
-        color: #19e3b0;
-    }
-
-    .btn-green {
-        background-color: white;
-        border: 2px solid #19e3b0;
-        color: #19e3b0;
-    }
-
-    .btn-green:hover {
-        background-color: #19e3b0;
-        border: 2px solid #19e3b0;
-        color: white;
-        transition: 0.5s;
-    }
-
-    .card-body {
-        background-color: #002233;
-        border-radius: 1rem;
-        color: white;
-        font-size: 1.5rem;
-        min-height: 150px;
-        min-width: 350px;
-        max-width: 350px;
-        margin-right: 15px;
-    }
-
-    .card-body:hover {
-        background-color: #001220;
-        transition: 0.5s;
-    }
-
-    .nav-link:hover {
-        color: #009879;
-        transition: 0.8s;
+        background-color: #f5f5f5;
+        font-family: 'Poppins';
     }
 </style>
 <body>
-    <div class="vh-100 bg-off-white">
-        <nav class="navbar shadow-sm">
-            <div class="container-fluid">
-                <a class="navbar-brand text-dark px-4" href="{% url 'bundles' %}"><strong>Veritas</strong></a>
-                {% if user.is_authenticated %}
-                    <a class="ms-auto mx-2 btn btn-black" href="{% url 'profile' user.id %}">My Profile</a>
-                    <a class="mx-2 link-dark" href="{% url 'logout' %}">Logout</a>
-                {% else %}
-                    <a class="btn btn-outline-dark ms-auto mx-2" href="{% url 'login' %}"><strong>Login</strong></a>
-                    <a class="btn btn-outline-success mx-2" href="{% url 'register' %}"><strong>Sign up</strong></a>
-                {% endif %}
-            </div>
-        </nav>
-        <div class="bg-off-white pt-3">
+    <div class="d-flex" style="height: 100vh;">
+        <div class="d-flex flex-column bg-dark pt-5">
+            <a href="{% url 'bundles' %}" class="p-3 link-light text-decoration-none text-center">RP</a>
+            <a href="{% url 'bundles' %}" class="p-3 link-light text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <polyline points="5 12 3 12 12 3 21 12 19 12"></polyline>
+                    <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"></path>
+                    <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"></path>
+                </svg>
+            </a>
+            <a href="{% url 'profile' user.id %}" class="p-3 link-light text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user-circle" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <circle cx="12" cy="12" r="9"></circle>
+                    <circle cx="12" cy="10" r="3"></circle>
+                    <path d="M6.168 18.849a4 4 0 0 1 3.832 -2.849h4a4 4 0 0 1 3.834 2.855"></path>
+                </svg>
+            </a>
+            <a href="{% url 'add-subscription' %}" class="p-3 link-light text-decoration-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-settings" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                    <path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+            </a>
+        </div>
+        <div class="container-fluid">
             {% block content %}
             {% endblock content %}
         </div>

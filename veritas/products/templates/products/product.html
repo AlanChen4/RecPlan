@@ -1,15 +1,16 @@
 {% extends 'choice_model/main.html' %}
 {% block content %}
 <div class="container pt-5">
-    <h1 class="mb-3">Subscription</h1>
+    <h1 class="mb-3">Your Subscription</h1>
     {% if subscription.status == "active" %}
-        <h4>Your Subscription</h4>
         <div class="card" style="width: 18rem;">
             <div class="card-body">
                 <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text">
-                {{ product.description }}
-                </p>
+                <p class="card-text">{{ product.description }}</p>
+                <form action="{% url 'cancel-subscription' %}" method="POST"> {% csrf_token %}
+                    <input type="hidden" name="subscription_id" value="{{ subscription.id }}">
+                    <input class="btn btn-outline-danger" type="submit" value="Cancel subscription">
+                </form>
             </div>
         </div>
     {% else %}

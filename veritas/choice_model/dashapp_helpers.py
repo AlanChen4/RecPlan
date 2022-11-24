@@ -6,12 +6,6 @@ from choice_model.constants import WAKE_BG_GEOJSON
 
 
 def create_bubble_plot_fig(visits):
-    # bubble_fig = px.Figure(data=[go.Scatter(
-    #     x=visits.index,
-    #     y=visits['visits'],
-    #     marker_size=visits['visits']/1000,
-    #     mode='markers',
-    # )])
     bubble_fig = px.scatter(
         x=visits.index,
         y=visits['visits'],
@@ -58,19 +52,20 @@ def create_equity_evaluation_fig(black, other):
     return equity_evaluation_fig
 
 
-def create_add_site_plot_fig(bg_utility_black):
+def create_spatial_equity_fig(bg_utility_black):
     fig = px.choropleth_mapbox(
         bg_utility_black, 
         geojson=WAKE_BG_GEOJSON, 
         locations='GEOID', 
         color='black_utility', 
         featureidkey='properties.GEOID',
-        color_continuous_scale="blugrn",
+        color_continuous_scale="Bluered",
         mapbox_style="carto-positron",
         zoom=8, 
         center={"lat": 35.7, "lon": -78.5},
         opacity=0.8,
     )
     fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    fig.update_traces(marker_line_width=1)
 
     return fig

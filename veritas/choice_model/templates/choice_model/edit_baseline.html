@@ -6,9 +6,10 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <label for="baselineModelName">Name for recalibrated baseline</label>
-                <input type="text" id="baselineModelName" name="baselineModelName" class="form-control" value="{{ baseline.name }}">
+                <input type="text" id="baselineModelName" name="baselineModelName" class="form-control"
+                    value="{{ baseline.name }}">
             </div>
-            <input type="submit" value="Submit" class="btn btn-black col-md-6 mt-4">
+            <input type="submit" value="Submit" class="btn btn-dark col-md-6 mt-4">
         </div>
         <div class="row mb-3">
             <div class="col-md-6">
@@ -19,14 +20,15 @@
             </div>
         </div>
         {% for baseline_site in baseline_sites %}
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <label class="form-label" for="{{ baseline_site.name }}">{{ baseline_site.name }}</label>
-                </div>
-                <div class="col-md-6">
-                    <input class="form-control" type="text" name="{{ baseline_site.name }} (site)" id="{{ baseline_site.name }}" value="{{ baseline_site.visits }}">
-                </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label" for="{{ baseline_site.name }}">{{ baseline_site.name }}</label>
             </div>
+            <div class="col-md-6">
+                <input class="form-control" type="text" name="{{ baseline_site.name }} (site)"
+                    id="{{ baseline_site.name }}" value="{{ baseline_site.visits }}">
+            </div>
+        </div>
         {% endfor %}
     </form>
 </div>

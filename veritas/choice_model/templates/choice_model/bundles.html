@@ -1,22 +1,22 @@
 {% extends 'choice_model/main.html' %}
 {% load plotly_dash %}
 {% block content %}
-<div class="container">
+<div class="container pt-3">
 
     <!-- saved models card -->
     <div class="bg-white rounded card px-4 mb-3 shadow-sm">
         <div class="d-flex flex-row mt-3">
             <h2>Saved Scenarios</h2>
-            <a class="btn btn-black my-2 ms-auto" href="{% url 'bundle-create' %}">Create New Scenario</a>
+            <a class="btn btn-dark my-2 ms-auto" href="{% url 'bundle-create' %}">Create New Scenario</a>
         </div>
         <div class="py-2">
             <div class="d-flex flex-row flex-nowrap overflow-auto pb-2">
 
                 <!-- card for baseline model -->
-                <div class="card card-body text-center justify-content-center">
+                <div class="card card-body bg-dark text-center justify-content-center text-white mx-2" style="min-width: 350px; max-width: 350px; min-height: 150px;">
                     Baseline
                     <div class="d-flex justify-content-center">
-                            <a class="btn btn-white border-0" href="{% url 'bundles' %}">Calculate
+                            <a class="btn border-0 text-white" href="{% url 'bundles' %}">Calculate
                             <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                 <rect x="4" y="3" width="16" height="18" rx="2"></rect>
@@ -30,9 +30,9 @@
                             </svg>
                         </a>
                         {% if custom_baseline %}
-                            <a class="btn btn-white border-0" href="{% url 'edit-baseline' custom_baseline.id %}">Edit
+                            <a class="btn border-0 text-white" href="{% url 'edit-baseline' custom_baseline.id %}">Edit
                         {% else %}
-                            <a class="btn btn-white border-0" href="{% url 'recalibrate-baseline' %}">Edit
+                            <a class="btn border-0 text-white" href="{% url 'recalibrate-baseline' %}">Edit
                         {% endif %}
                             <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
@@ -42,7 +42,7 @@
                             </svg>
                         </a>
                         {% if custom_baseline %}
-                            <a class="btn btn-white border-0" href="{% url 'delete-baseline' custom_baseline.id %}">Delete
+                            <a class="btn border-0 text-white" href="{% url 'delete-baseline' custom_baseline.id %}">Delete
                             <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                 <line x1="4" y1="7" x2="20" y2="7"></line>
@@ -59,10 +59,10 @@
 
                 <!-- load non-baseline bundles -->
                 {% for bundle in bundles %}
-                    <div class="card card-body text-center justify-content-center">
+                    <div class="card card-body text-center justify-content-center bg-dark text-white mx-2" style="min-width: 350px; max-width: 350px; min-height: 150px;">
                         {{ bundle.nickname }}
                         <div class="d-flex justify-content-center">
-                            <a class="btn btn-white border-0" href="{% url 'bundles' bundle.id %}">Calculate
+                            <a class="btn border-0 text-white" href="{% url 'bundles' bundle.id %}">Calculate
                                 <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                     <rect x="4" y="3" width="16" height="18" rx="2"></rect>
@@ -75,7 +75,7 @@
                                     <line x1="16" y1="17" x2="16" y2="17.01"></line>
                                 </svg>
                             </a>
-                            <a class="btn btn-white border-0" href="{% url 'bundle-update' bundle.id %}">Edit
+                            <a class="btn border-0 text-white" href="{% url 'bundle-update' bundle.id %}">Edit
                                 <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                     <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1"></path>
@@ -83,7 +83,7 @@
                                     <path d="M16 5l3 3"></path>
                                 </svg>
                             </a>
-                            <a class="btn btn-white border-0" href="{% url 'bundle-delete' bundle.id %}">Delete
+                            <a class="btn border-0 text-white" href="{% url 'bundle-delete' bundle.id %}">Delete
                                 <svg width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                     <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                                     <line x1="4" y1="7" x2="20" y2="7"></line>
@@ -104,7 +104,7 @@
     <div class="bg-white rounded card p-3 shadow-sm">
         <div class="d-flex flex-row mb-3">
             <h2>Viewing <strong>{% if bundle == None %}Baseline{% else %}{{ bundle.nickname }}{% endif %}</strong></h2>
-            <button class="btn btn-black ms-auto mx-1" data-bs-toggle="collapse" data-bs-target="#collapse-baseline" aria-expanded="true">
+            <button class="btn btn-dark ms-auto mx-1" data-bs-toggle="collapse" data-bs-target="#collapse-baseline" aria-expanded="true">
                 Show/Hide
             </button>
         </div>

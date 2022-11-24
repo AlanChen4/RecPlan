@@ -9,4 +9,5 @@ urlpatterns = [
     path('subscription/', ProductLandingPageView.as_view(), name='add-subscription'),
     path('create-portal-session/', CreatePortalSessionView.as_view(), name='create-portal-session'),
     path('create-checkout-session/', CreateCheckoutSessionView.as_view(), name='create-checkout-session'),
+    path('cancel-subscription/', CancelSubscriptionView.as_view(), name='cancel-subscription'),
 ]

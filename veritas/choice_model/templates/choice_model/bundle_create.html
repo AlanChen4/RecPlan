@@ -5,7 +5,7 @@
     <form method="POST">
         {% csrf_token %}
         {{form.nickname|as_crispy_field}}
-        <button class="btn btn-black" type="submit">Create</button>
+        <button class="btn btn-dark" type="submit">Create</button>
     </form>
 </div>
 {% endblock content%}

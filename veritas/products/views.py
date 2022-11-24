@@ -83,17 +83,11 @@ def WebhookView(request, *args, **kwargs):
 
         session = event['data']['object']
         stripe_subscription_id = session.get('subscription')
-        try:
-            # Retrieve CustomUser instance with said subscription id
-            req_userprofile = CustomUser.objects.get(stripe_subscription_id=subscription_id)
-        except:
-            # No subscription with that id saved in our database
-            req_userprofile = None
 
-        if req_userprofile:
-            # Remove the subscription id from the database
-            req_userprofile.stripe_subscription_id = ""
-            req_userprofile.save()
+        # Retrieve StripeCustomer instance with said subscription id
+        req_userprofile = StripeCustomer.objects.get(stripe_subscription_id=stripe_subscription_id)
+        req_userprofile.delete()
+
     return JsonResponse({"success": True}, status=200)
 
 
@@ -135,3 +129,10 @@ class CreateCheckoutSessionView(View):
             cancel_url=YOUR_DOMAIN + '/cancel/',
         )
         return redirect(checkout_session.url, code=303)
+
+
+class CancelSubscriptionView(View):
+
+    def post(self, request, *args, **kwargs):
+        stripe.Subscription.delete(request.POST['subscription_id'])
+        return redirect('add-subscription')

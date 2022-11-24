@@ -9,21 +9,22 @@
             <input class="form-control" type="text" placeholder="{{ bundle.nickname }}" name="siteName">
         </div>
         <div class="col-md-3">
-            <input class="btn btn-black" type="submit" value="Edit Name">
+            <input class="btn btn-dark" type="submit" value="Edit Name">
         </div>
     </form>
     <div class="row">
         <div class="col md-6">
             <form method="GET" action="{% url 'bundle-update' bundle.id %}">
                 <div class="form-check py-2">
-                    <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if modified %} checked {% endif %}>
-                    <label class="form-check-label" for="modified-only">Only Show Modified/New Sites</label>  
+                    <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if
+                        modified %} checked {% endif %}>
+                    <label class="form-check-label" for="modified-only">Only Show Modified/New Sites</label>
                     <input class="btn btn-primary" type="submit" value="Filter">
                 </div>
             </form>
         </div>
         <div class="col md-6">
-            <a class="btn btn-black" href="{% url 'site-create' bundle.id %}">Add New Site</a>
+            <a class="btn btn-dark" href="{% url 'site-create' bundle.id %}">Add New Site</a>
         </div>
     </div>
     <div class="row">
@@ -43,14 +44,14 @@
                         <td>{{ site.name }}</td>
                         <td>
                             {% if site.name in modified_site_names %}
-                                <a href="{% url 'modified-site-delete' site.id %}">Delete/Reset</a>
+                            <a href="{% url 'modified-site-delete' site.id %}">Delete/Reset</a>
                             {% endif %}
                         </td>
                         <td>
                             {% if site.name in modified_site_names %}
-                                <a href="{% url 'modified-site-update' bundle.id site.name %}">Modify</a>
-                            {% else  %}
-                                <a href="{% url 'modified-site-create' bundle.id site.name %}">Modify</a>
+                            <a href="{% url 'modified-site-update' bundle.id site.name %}">Modify</a>
+                            {% else %}
+                            <a href="{% url 'modified-site-create' bundle.id site.name %}">Modify</a>
                             {% endif %}
                         </td>
                         <td>
@@ -59,54 +60,61 @@
                     </tr>
                 </tbody>
                 {% empty %}
-                    <h3>None</h3>
+                <h3>None</h3>
                 {% endfor %}
             </table>
         </div>
         <div class="col-md-6">
             <div class="row">
                 {% if selected_site is not None %}
-                    <h2>{{selected_site.name}}</h2>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h5>Acres: <strong>{{selected_site.acres}}</strong></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>Waterbody: <strong>{% if selected_site.waterbody > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
+                <h2>{{selected_site.name}}</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Acres: <strong>{{selected_site.acres}}</strong></h5>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h5>Trails: <strong>{{selected_site.trails}}</strong></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>Trail Miles: <strong>{{selected_site.trail_miles}}</strong></h5>
-                        </div>
+                    <div class="col-md-4">
+                        <h5>Waterbody: <strong>{% if selected_site.waterbody > 0 %} Yes {% else %} No {% endif
+                                %}</strong></h5>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h5>Picnic Area: <strong>{% if selected_site.picnic_area > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>Sports Facilities: <strong>{% if selected_site.sports_facilities > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>Swimming Facilities: <strong>{% if selected_site.swimming_facilities > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Trails: <strong>{{selected_site.trails}}</strong></h5>
                     </div>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <h5>Boat Launch: <strong>{% if selected_site.boat_launch > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>Bathrooms: <strong>{% if selected_site.bathrooms > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
-                        <div class="col-md-4">
-                            <h5>Playgrounds: <strong>{% if selected_site.playgrounds > 0 %} Yes {% else %} No {% endif %}</strong></h5>
-                        </div>
+                    <div class="col-md-4">
+                        <h5>Trail Miles: <strong>{{selected_site.trail_miles}}</strong></h5>
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Picnic Area: <strong>{% if selected_site.picnic_area > 0 %} Yes {% else %} No {% endif
+                                %}</strong></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Sports Facilities: <strong>{% if selected_site.sports_facilities > 0 %} Yes {% else %} No {%
+                                endif %}</strong></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Swimming Facilities: <strong>{% if selected_site.swimming_facilities > 0 %} Yes {% else %}
+                                No {% endif %}</strong></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <h5>Boat Launch: <strong>{% if selected_site.boat_launch > 0 %} Yes {% else %} No {% endif
+                                %}</strong></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Bathrooms: <strong>{% if selected_site.bathrooms > 0 %} Yes {% else %} No {% endif
+                                %}</strong></h5>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Playgrounds: <strong>{% if selected_site.playgrounds > 0 %} Yes {% else %} No {% endif
+                                %}</strong></h5>
+                    </div>
+                </div>
                 {% else %}
-                    <h1>No Site Selected</h1>
+                <h1>No Site Selected</h1>
                 {% endif %}
             </div>
             {% plotly_app name="SiteSelection" ratio=0.5 initial_arguments=dash_context %}
