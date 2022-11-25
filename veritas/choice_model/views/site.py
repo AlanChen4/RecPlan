@@ -128,7 +128,7 @@ class ModifiedSiteUpdate(LoginRequiredMixin, UpdateView):
         bundle_id = str(self.kwargs['pk'])
         site_name = str(self.kwargs['site_name'])
 
-        return ModifiedSite.objects.get(id=bundle_id, name=site_name)
+        return ModifiedSite.objects.get(bundle=bundle_id, name=site_name)
 
     def get_success_url(self):
         bundle_id = str(self.kwargs['pk'])

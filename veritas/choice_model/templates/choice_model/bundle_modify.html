@@ -16,8 +16,7 @@
         <div class="col md-6">
             <form method="GET" action="{% url 'bundle-update' bundle.id %}">
                 <div class="form-check py-2">
-                    <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if
-                        modified %} checked {% endif %}>
+                    <input class="form-check-input" type="checkbox" name="modified-only" id="modified-only" {% if modified %} checked {% endif %}>
                     <label class="form-check-label" for="modified-only">Only Show Modified/New Sites</label>
                     <input class="btn btn-primary" type="submit" value="Filter">
                 </div>
@@ -73,8 +72,7 @@
                         <h5>Acres: <strong>{{selected_site.acres}}</strong></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Waterbody: <strong>{% if selected_site.waterbody > 0 %} Yes {% else %} No {% endif
-                                %}</strong></h5>
+                        <h5>Waterbody: <strong>{% if selected_site.waterbody > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                 </div>
                 <div class="row">
@@ -87,34 +85,28 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <h5>Picnic Area: <strong>{% if selected_site.picnic_area > 0 %} Yes {% else %} No {% endif
-                                %}</strong></h5>
+                        <h5>Picnic Area: <strong>{% if selected_site.picnic_area > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Sports Facilities: <strong>{% if selected_site.sports_facilities > 0 %} Yes {% else %} No {%
-                                endif %}</strong></h5>
+                        <h5>Sports Facilities: <strong>{% if selected_site.sports_facilities > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Swimming Facilities: <strong>{% if selected_site.swimming_facilities > 0 %} Yes {% else %}
-                                No {% endif %}</strong></h5>
+                        <h5>Swimming Facilities: <strong>{% if selected_site.swimming_facilities > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <h5>Boat Launch: <strong>{% if selected_site.boat_launch > 0 %} Yes {% else %} No {% endif
-                                %}</strong></h5>
+                        <h5>Boat Launch: <strong>{% if selected_site.boat_launch > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Bathrooms: <strong>{% if selected_site.bathrooms > 0 %} Yes {% else %} No {% endif
-                                %}</strong></h5>
+                        <h5>Bathrooms: <strong>{% if selected_site.bathrooms > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                     <div class="col-md-4">
-                        <h5>Playgrounds: <strong>{% if selected_site.playgrounds > 0 %} Yes {% else %} No {% endif
-                                %}</strong></h5>
+                        <h5>Playgrounds: <strong>{% if selected_site.playgrounds > 0 %} Yes {% else %} No {% endif %}</strong></h5>
                     </div>
                 </div>
                 {% else %}
-                <h1>No Site Selected</h1>
+                    <h1>No Site Selected</h1>
                 {% endif %}
             </div>
             {% plotly_app name="SiteSelection" ratio=0.5 initial_arguments=dash_context %}
