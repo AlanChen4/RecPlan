@@ -93,7 +93,7 @@ MIDDLEWARE = [
 ]
 
 LOGIN_REDIRECT_URL = reverse_lazy('bundles')
-LOGIN_URL = reverse_lazy('landing')
+LOGIN_URL = reverse_lazy('register')
 
 ROOT_URLCONF = 'veritas.urls'
 
